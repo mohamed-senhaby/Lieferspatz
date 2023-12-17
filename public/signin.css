@@ -1,0 +1,93 @@
+.gradient-background {
+  background: linear-gradient(300deg, #00bfff, #ff4c68, #ef8172);
+  background-size: 180% 180%;
+  animation: gradient-animation 18s ease infinite;
+}
+
+@keyframes gradient-animation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.container {
+  height: 98vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.form-label {
+  margin: 30px auto;
+  font-size: -webkit-xxx-large;
+}
+
+.form-outline {
+  /* Increase the font size and height of the form elements */
+  font-size: 1.2rem;
+  height: 60px; /* Adjust the height as needed */
+  margin: 30px auto;
+  color: white;
+}
+
+.btn {
+  /* Increase the font size and padding of the button */
+  font-size: 1.5rem;
+  padding: 10px 20px; /* Adjust the padding as needed */
+  margin: 20px auto;
+  width: -webkit-fill-available;
+  border-radius: 7px;
+  cursor: pointer;
+  height: 60px;
+  transition-duration: 0.4s;
+  background-color: transparent;
+  color: black;
+  border: 3px solid white; /* Green */
+}
+
+.btn:hover {
+  background-color: white; /* Green */
+  color: black;
+}
+
+.text-center {
+  color: white;
+  /* Increase the font size of the text in the center */
+  font-size: 1.2rem;
+  margin: 20px auto;
+}
+
+.form-control {
+  /* Increase the font size and height of the form controls */
+  width: -webkit-fill-available;
+  font-size: 1.6rem;
+  height: 50px; /* Adjust the height as needed */
+  border-radius: 7px;
+  padding: 10px 20px;
+  margin: 20px auto;
+}
+
+/* Add any other styles you want to customize */
+
+/* .form-label,
+.form-check-label,
+.text-center {
+  color: white;
+  margin: 20px auto;
+} */
+
+.text-center {
+  color: white;
+  font-size: -webkit-xxx-large;
+}
+
+#foodImg {
+  margin-left: 400px;
+  opacity: 0.9;
+}
