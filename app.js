@@ -23,6 +23,15 @@ app.get("/", (req, res) => {
   }
 });
 
+app.get("/menu", (req, res) => {
+  try {
+    res.sendFile(__dirname + "/views/resturant.html");
+  } catch (error) {
+    console.error("Error retrieving items:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
