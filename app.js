@@ -52,7 +52,7 @@ app.use(express.static(__dirname + "/public"));
 // Define your routes
 app.get("/", (req, res) => {
   try {
-    res.sendFile(__dirname + "/views/main.html");
+    res.render("main.ejs");
   } catch (error) {
     console.error("Error retrieving items:", error);
     res.status(500).send("Internal Server Error");
@@ -141,17 +141,11 @@ app.post("/register", (req, res) => {
       }
     }
   );
-
-  const restaurantName = req.body.RestaurantName;
-
-  res.render("resturant-profile", { restaurantName });
 });
 
 app.get("/restaurant-profile", (req, res) => {
   try {
-    res.render("/views/resturant-profile.ejs", {
-      restaurantName: restaurantName,
-    });
+    res.render("resturant-profile.ejs");
   } catch (error) {
     console.error("Error retrieving items:", error);
     res.status(500).send("Internal Server Error");
@@ -160,25 +154,81 @@ app.get("/restaurant-profile", (req, res) => {
 
 app.get("/register", (req, res) => {
   try {
-    res.sendFile(__dirname + "/views/register.html");
+    res.render("register.ejs");
   } catch (error) {
     console.error("Error retrieving items:", error);
     res.status(500).send("Internal Server Error");
   }
 });
 
-app.get("/Signin", (req, res) => {
+app.get("/signin", (req, res) => {
   try {
-    res.sendFile(__dirname + "/views/signin.html");
+    res.render("signin.ejs");
   } catch (error) {
     console.error("Error retrieving items:", error);
     res.status(500).send("Internal Server Error");
   }
 });
 
-// Add a route to fetch all users
+const handleSignIn = (req, res, userType, emailColumn, passwordColumn) => {
+  const { email, password } = req.body;
+
+  db.get(
+    `SELECT * FROM users WHERE ${emailColumn} = ? AND ${passwordColumn} = ?`,
+    [email, password],
+    (err, row) => {
+      if (err) {
+        console.error("Error checking user data in the database:", err);
+        return res.status(500).send("Internal Server Error");
+      }
+
+      if (row) {
+        console.log("User found:", row);
+        redirectToProfile(res, userType);
+      } else {
+        console.log("User not found");
+        res.status(401).send("Invalid email or password");
+      }
+    }
+  );
+};
+
+const redirectToProfile = (res, userType) => {
+  if (userType === "customer") {
+    res.redirect(`/restaurants`);
+  } else {
+    res.redirect(`/restaurant-profile`);
+  }
+};
+
+app.post("/signin", (req, res) => {
+  const user = req.body.userType;
+
+  if (user === "customer") {
+    handleSignIn(req, res, user, "email", "password");
+  } else {
+    handleSignIn(req, res, user, "RestaurantEmail", "RestaurantPassword");
+  }
+});
+
+// Add this route to your existing server code
+app.get("/restaurants", (req, res) => {
+  // Fetch all restaurants from the database
+  db.all(
+    "SELECT * FROM users WHERE userType = 'restaurantOwner'",
+    (err, restaurants) => {
+      if (err) {
+        console.error("Error retrieving restaurants from the database:", err);
+        res.status(500).send("Internal Server Error");
+      } else {
+        // Pass the retrieved data to the EJS template
+        res.render("restaurants.ejs", { restaurants });
+      }
+    }
+  );
+});
+
 app.get("/users", (req, res) => {
-  // Retrieve all users from the "users" table
   db.all("SELECT * FROM users", (err, rows) => {
     if (err) {
       res.status(500).send("Internal Server Error");
@@ -188,11 +238,9 @@ app.get("/users", (req, res) => {
   });
 });
 
-// Add a route to delete a user by ID
 app.get("/users/:id", (req, res) => {
   const userId = req.params.id;
 
-  // Delete the user from the database based on the ID
   db.run("DELETE FROM users WHERE id = ?", [userId], (err) => {
     if (err) {
       console.error("Error deleting user from database:", err);
