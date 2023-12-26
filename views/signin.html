@@ -1,75 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="..\public\signin.css" />
-    <title>Document</title>
-  </head>
-  <body>
-    <section id="signin" class="gradient-background">
-      <div class="container col-xxl-12 px-4 pt-5">
-        <div class="col-xxl-6">
-          <form>
-            <!-- Email input -->
-            <div class="form-outline mb-4" id="email">
-              <label class="form-label" for="form2Example1"
-                >Email address</label
-              >
-              <input
-                type="email"
-                id="form2Example1"
-                class="form-control"
-                placeholder="Email address"
-              />
-            </div>
-            <br />
-            <br />
-            <br />
 
-            <!-- Password input -->
-            <div class="form-outline mb-4" id="password">
-              <label class="form-label" for="form2Example2"> Password</label>
-              <input
-                type="password"
-                id="form2Example2"
-                class="form-control"
-                placeholder="Password"
-              />
-            </div>
-            <br />
-            <br />
-            <br />
-            <!-- Submit button -->
-            <button
-              type="button"
-              class="btn btn-outline-light btn-lg px-4 fw-bold"
-              onclick=""
-            >
-              Sign in
-            </button>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-            <!-- Register buttons -->
-            <div class="text-center">
-              <p>
-                Not a member?
-                <a href="register.html" title="Register">Register</a>
-                <a href="main.html">Home</a>
-              </p>
-            </div>
-          </form>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+  <title>Sign In</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      max-height: 80vh;
+
+      overflow-y: auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 22rem;
+
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 8px;
+    }
+
+    input,
+    select {
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .user-type {
+      margin-bottom: 15px;
+    }
+
+    /* Additional styles for customer fields */
+    .customer-fields,
+    .restaurant-fields {
+      display: none;
+    }
+
+    .customer-fields input {
+      margin-bottom: 15px;
+    }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var userTypeSelect = document.getElementById('userType');
+      var customerFields = document.querySelector('.customer-fields');
+      var restaurantFields = document.querySelector('.restaurant-fields');
+      var openingTimeField = document.getElementById('openingTime');
+      var closingTimeField = document.getElementById('closingTime');
+
+      // Function to toggle visibility of customer and restaurant fields
+      function toggleFields() {
+        if (userTypeSelect.value === 'customer') {
+          customerFields.style.display = 'block';
+          restaurantFields.style.display = 'none';
+        } else if (userTypeSelect.value === 'restaurantOwner') {
+          customerFields.style.display = 'none';
+          restaurantFields.style.display = 'block';
+        } else {
+          customerFields.style.display = 'none';
+          restaurantFields.style.display = 'none';
+        }
+      }
+
+      // Function to toggle visibility of opening and closing time fields
+      function toggleTimeFields() {
+        if (userTypeSelect.value === 'restaurantOwner') {
+          openingTimeField.parentElement.style.display = 'block';
+          closingTimeField.parentElement.style.display = 'block';
+        } else {
+          openingTimeField.parentElement.style.display = 'none';
+          closingTimeField.parentElement.style.display = 'none';
+        }
+      }
+
+      // Initial setup
+      toggleFields();
+      toggleTimeFields();
+
+      // Add event listeners
+      userTypeSelect.addEventListener('change', function () {
+        toggleFields();
+        toggleTimeFields();
+      });
+    });
+
+  </script>
+</head>
+
+<body>
+
+  <div class="container">
+    <h2>Sign In</h2>
+    <form action="#" method="post" class="row ">
+
+      <div class="form-floating user-type ">
+        <select class="form-select" id="userType" name="userType" aria-label="Floating label select example">
+
+          <option value="customer">Customer</option>
+          <option value="restaurantOwner">Restaurant Owner</option>
+        </select>
+        <label for="userType">Select User Type:</label>
+      </div>
+
+      <!-- customer fields -->
+      <div class="customer-fields">
+        <div class="form-floating mb-3">
+          <input type="text" id="username" name="username" class="form-control" placeholder="name@example.com" required>
+          <label for="username">Username</label>
         </div>
 
-        <div class="col-10 col-md-8 col-lg-6" id="foodImg">
-          <img
-            src="../public/images/burger_1037762.png"
-            alt="Chef in the kitchen"
-            class="d-block mx-lg-auto img-fluid"
-            height="530"
-            loading="lazy"
-          />
+        <div class="form-floating">
+          <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+          <label for="password">Password</label>
         </div>
       </div>
-    </section>
-  </body>
+
+      <!-- restaurant fields -->
+      <div class="restaurant-fields">
+
+        <div class="form-floating mb-3">
+          <input type="text" id="username" name="username" class="form-control" placeholder="name@example.com" required>
+          <label for="username">Username</label>
+        </div>
+
+        <div class="form-floating">
+          <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+          <label for="password">Password</label>
+        </div>
+
+      </div>
+
+
+
+      <button type="submit">Sign In</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+    crossorigin="anonymous"></script>
+</body>
+
 </html>
