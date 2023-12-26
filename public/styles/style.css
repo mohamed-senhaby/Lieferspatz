@@ -1,5 +1,5 @@
 .gradient-background {
-  background: linear-gradient(300deg, #00bfff, #ff4c68, #ef8172);
+  background: linear-gradient(300deg, #cd7f36, #f6871f, rgb(254, 192, 135));
   background-size: 180% 180%;
   animation: gradient-animation 18s ease infinite;
 }
@@ -30,4 +30,25 @@
 svg,
 svg image {
   fill: #a32110 !important;
+}
+
+#restaurant main {
+  margin: 3rem !important;
+}
+
+.resturant-logo {
+  margin-left: 25rem !important;
+}
+
+#add-item {
+  margin-top: 12rem;
+}
+
+#add-item form textarea {
+  margin-bottom: 3rem;
+}
+
+#add-item form label {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
