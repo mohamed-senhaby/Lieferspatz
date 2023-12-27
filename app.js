@@ -9,7 +9,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 app.set("view engine", "ejs");
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 
 const db = new sqlite3.Database(__dirname + "/database.db", (err) => {
   if (err) {
@@ -226,6 +226,15 @@ app.get("/restaurants", (req, res) => {
       }
     }
   );
+});
+
+app.get("/add-item", (req, res) => {
+  try {
+    res.render("add-item.ejs");
+  } catch (error) {
+    console.error("Error retrieving items:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 app.get("/users", (req, res) => {
