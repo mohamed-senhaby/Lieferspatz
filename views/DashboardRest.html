@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="//cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <title>Dashboard</title>
+    <style>
+      .nav-pills .nav-link {
+        color: black !important; /* Set the desired text color for non-active links */
+      }
+      /* Custom CSS to style the active link */
+      .nav-pills .nav-link.active {
+        color: white !important; /* Set the desired text color for the active link */
+        background-color: #007bff !important; /* Set the desired background color for the active link */
+      }
+    </style>
+    <script
+      src="https://code.jquery.com/jquery-3.6.4.min.js"
+      integrity="sha256-oP6HI/tZ1aP6HI0M0/8lAc5Y4HMUZp0uE4iiIui3SsM="
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <!-- Header -->
+    <header style="margin-bottom: 55px">
+      <nav class="navbar bg-body-tertiary fixed-top">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/">
+            <span>Lieferptatz</span>
+          </a>
+          <form class="d-flex mt-0" role="search">
+            <input
+              class="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+            />
+            <button class="btn btn-outline-success" type="submit">
+              Search
+            </button>
+          </form>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#offcanvasNavbar"
+            aria-controls="offcanvasNavbar"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div
+            class="offcanvas offcanvas-end"
+            tabindex="-1"
+            id="offcanvasNavbar"
+            aria-labelledby="offcanvasNavbarLabel"
+          >
+            <div class="offcanvas-header">
+              <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+                Lieferspatz
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="offcanvas"
+                aria-label="Close"
+              ></button>
+            </div>
+
+            <div class="offcanvas-body">
+              <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="#"
+                    >Home</a
+                  >
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item dropdown">
+                  <a
+                    class="nav-link dropdown-toggle"
+                    href="#"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    Dropdown
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Action</a></li>
+                    <li>
+                      <a class="dropdown-item" href="#">Another action</a>
+                    </li>
+                    <li>
+                      <hr class="dropdown-divider" />
+                    </li>
+                    <li>
+                      <a class="dropdown-item" href="#">Something else here</a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+              <form class="d-flex mt-3" role="search">
+                <input
+                  class="form-control me-2"
+                  type="search"
+                  placeholder="Search"
+                  aria-label="Search"
+                />
+                <button class="btn btn-outline-success" type="submit">
+                  Search
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <!-- container -->
+    <div class="container-fluid d-flex flex-row">
+      <!-- Sidebar -->
+      <nav
+        class="d-flex flex-column flex-shrink-0 p-3 bg-white col-lg-2"
+        style="height: 100vh"
+      >
+        <a
+          class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="40"
+            height="32"
+            fill="currentColor"
+            class="bi bi-graph-up"
+            viewBox="0 0 16 16"
+            style="margin-right: 10px"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M0 0h1v15h15v1H0zm14.817 3.113a.5.5 0 0 1 .07.704l-4.5 5.5a.5.5 0 0 1-.74.037L7.06 6.767l-3.656 5.027a.5.5 0 0 1-.808-.588l4-5.5a.5.5 0 0 1 .758-.06l2.609 2.61 4.15-5.073a.5.5 0 0 1 .704-.07Z"
+            />
+          </svg>
+          <span class="fs-4">Dashboard</span>
+        </a>
+        <hr />
+        <ul class="nav nav-pills flex-column mb-auto">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#overview">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-pin"
+                viewBox="0 0 16 16"
+                style="margin-right: 5px"
+              >
+                <path
+                  d="M4.146.146A.5.5 0 0 1 4.5 0h7a.5.5 0 0 1 .5.5c0 .68-.342 1.174-.646 1.479-.126.125-.25.224-.354.298v4.431l.078.048c.203.127.476.314.751.555C12.36 7.775 13 8.527 13 9.5a.5.5 0 0 1-.5.5h-4v4.5c0 .276-.224 1.5-.5 1.5s-.5-1.224-.5-1.5V10h-4a.5.5 0 0 1-.5-.5c0-.973.64-1.725 1.17-2.189A5.921 5.921 0 0 1 5 6.708V2.277a2.77 2.77 0 0 1-.354-.298C4.342 1.674 4 1.179 4 .5a.5.5 0 0 1 .146-.354zm1.58 1.408-.002-.001.002.001m-.002-.001.002.001A.5.5 0 0 1 6 2v5a.5.5 0 0 1-.276.447h-.002l-.012.007-.054.03a4.922 4.922 0 0 0-.827.58c-.318.278-.585.596-.725.936h7.792c-.14-.34-.407-.658-.725-.936a4.915 4.915 0 0 0-.881-.61l-.012-.006h-.002A.5.5 0 0 1 10 7V2a.5.5 0 0 1 .295-.458 1.775 1.775 0 0 0 .351-.271c.08-.08.155-.17.214-.271H5.14c.06.1.133.191.214.271a1.78 1.78 0 0 0 .37.282"
+                />
+              </svg>
+              Overview
+            </a>
+          </li>
+          <li>
+            <a class="nav-link link-dark" href="#menu">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-grid"
+                viewBox="0 0 16 16"
+                style="margin-right: 5px"
+              >
+                <path
+                  d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5zM2.5 2a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zM1 10.5A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5zm6.5.5A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5zm1.5-.5a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5z"
+                />
+              </svg>
+              Menu
+            </a>
+          </li>
+          <li>
+            <a class="nav-link link-dark" href="#orders">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-list-ul"
+                viewBox="0 0 16 16"
+                style="margin-right: 5px"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5m-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2m0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2"
+                />
+              </svg>
+              Orders
+            </a>
+          </li>
+          <li>
+            <a class="nav-link link-dark" href="#ordersHistory">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-table"
+                viewBox="0 0 16 16"
+                style="margin-right: 5px"
+              >
+                <path
+                  d="M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm15 2h-4v3h4zm0 4h-4v3h4zm0 4h-4v3h3a1 1 0 0 0 1-1zm-5 3v-3H6v3zm-5 0v-3H1v2a1 1 0 0 0 1 1zm-4-4h4V8H1zm0-4h4V4H1zm5-3v3h4V4zm4 4H6v3h4z"
+                />
+              </svg>
+              Orders history
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Content -->
+      <main class="px-lg-4 px-xl-5 col-lg-10" style="background-color: #f7f8f9">
+        <!-- Overview container -->
+        <article
+          id="overview"
+          style="height: 100vh; display: block"
+          class="content-section row"
+        >
+          <div
+            class="row"
+            style="
+              margin-top: 50px;
+              display: flex;
+              flex-direction: row;
+              justify-content: space-evenly;
+              align-items: center;
+            "
+          >
+            <div
+              class="card text-bg-success mb-3"
+              style="max-width: 18rem; height: 110px"
+            >
+              <div class="card-header">Total orders</div>
+              <div class="card-body">
+                <p class="card-text">total orders = <span>0</span></p>
+              </div>
+            </div>
+
+            <div
+              class="card text-bg-primary mb-3"
+              style="max-width: 18rem; height: 110px"
+            >
+              <div class="card-header">New orders</div>
+              <div class="card-body">
+                <p class="card-text">New orders = <span>0</span></p>
+              </div>
+            </div>
+
+            <div
+              class="card text-bg-danger mb-3"
+              style="max-width: 18rem; height: 110px"
+            >
+              <div class="card-header">Refused orders</div>
+              <div class="card-body">
+                <p class="card-text">Refused orders = <span>0</span></p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Menu container -->
+        <article id="menu" style="display: none" class="content-section">
+          <div class="row" style="margin-top: 10px">
+            <section class="container">
+              <div class="row">
+                <div class="col-lg-6 col-md-8 px-lg-4">
+                  <h1 class="fw-light">My Menu</h1>
+
+                  <p>
+                    <a href="#" class="btn btn-danger my-2">Delete the Menu</a>
+                    <a
+                      href="#"
+                      class="btn btn-primary my-2"
+                      data-bs-toggle="modal"
+                      data-bs-target="#addItemModal"
+                      onclick="addItem()"
+                      >Add Item</a
+                    >
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <hr />
+
+            <div
+              class="modal fade"
+              id="addItemModal"
+              tabindex="-1"
+              aria-labelledby="addItemModalLabel"
+              aria-hidden="true"
+            >
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">
+                      Add a new item to Menu
+                    </h1>
+                    <button
+                      type="button"
+                      class="btn-close"
+                      data-bs-dismiss="modal"
+                      aria-label="Close"
+                    ></button>
+                  </div>
+                  <div class="modal-body">
+                    <form
+                      class="item"
+                      action="/add-item"
+                      method="post"
+                      enctype="multipart/form-data"
+                    >
+                      <label for="item-name">Item Name</label>
+                      <input
+                        type="text"
+                        name="item-name"
+                        class="form-control"
+                        id="item-name"
+                      />
+
+                      <label for="item-price">Item Price</label>
+                      <input
+                        type="text"
+                        name="item-price"
+                        class="form-control"
+                        id="item-price"
+                      />
+
+                      <label for="image">Choose an Image</label>
+                      <input
+                        type="file"
+                        name="image"
+                        accept="image/*"
+                        class="form-control"
+                        id="image"
+                      />
+
+                      <label for="category">Select a Category</label>
+                      <select
+                        name="category"
+                        id="category"
+                        class="form-control"
+                      >
+                        <option value="category1">Drinks</option>
+                        <option value="category2">Meals</option>
+                      </select>
+
+                      <label for="post">Description</label>
+                      <textarea
+                        name="post"
+                        class="form-control"
+                        id="floatingTextarea"
+                      ></textarea>
+
+                      <div class="modal-footer row">
+                        <button
+                          type="submit"
+                          name="button"
+                          class="btn btn-primary"
+                        >
+                          Submit
+                        </button>
+                        <button
+                          type="button"
+                          class="btn btn-danger"
+                          data-bs-dismiss="modal"
+                        >
+                          Close
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="album py-5 bg-body-tertiary">
+              <div class="container">
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-3">
+                  <div class="col">
+                    <div class="card shadow-sm">
+                      <img src="../public/images/burger.jpg" alt="Burger" />
+
+                      <div class="card-body">
+                        <p class="card-text">Cheese Burger</p>
+                        <div
+                          class="d-flex justify-content-between align-items-center"
+                        >
+                          <div class="btn-group">
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-primary"
+                            >
+                              View
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-success"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-danger"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                          <large class="text-body-secondary">8 Euro</large>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="card shadow-sm">
+                      <img src="../public/images/pizza.jpg" alt="pizza" />
+                      <div class="card-body">
+                        <p class="card-text">Pizza Margherita</p>
+                        <div
+                          class="d-flex justify-content-between align-items-center"
+                        >
+                          <div class="btn-group">
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-primary"
+                            >
+                              View
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-success"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-danger"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                          <small class="text-body-secondary">8,5 Euro </small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col">
+                    <div class="card shadow-sm">
+                      <svg
+                        class="bd-placeholder-img card-img-top"
+                        width="100%"
+                        height="225"
+                        xmlns="http://www.w3.org/2000/svg"
+                        role="img"
+                        aria-label="Placeholder: صورة مصغرة"
+                        preserveAspectRatio="xMidYMid slice"
+                        focusable="false"
+                      >
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#55595c"></rect>
+                        <text x="50%" y="50%" fill="#eceeef" dy=".3em">
+                          صورة مصغرة
+                        </text>
+                      </svg>
+                      <div class="card-body">
+                        <p class="card-text">
+                          هذه بطاقة أوسع مع نص داعم أدناه كمقدمة طبيعية لمحتوى
+                          إضافي. هذا المحتوى أطول قليلاً.
+                        </p>
+                        <div
+                          class="d-flex justify-content-between align-items-center"
+                        >
+                          <div class="btn-group">
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-secondary"
+                            >
+                              عرض
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-secondary"
+                            >
+                              تعديل
+                            </button>
+                          </div>
+                          <small class="text-body-secondary">9 دقائق</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="card shadow-sm">
+                      <svg
+                        class="bd-placeholder-img card-img-top"
+                        width="100%"
+                        height="225"
+                        xmlns="http://www.w3.org/2000/svg"
+                        role="img"
+                        aria-label="Placeholder: صورة مصغرة"
+                        preserveAspectRatio="xMidYMid slice"
+                        focusable="false"
+                      >
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#55595c"></rect>
+                        <text x="50%" y="50%" fill="#eceeef" dy=".3em">
+                          صورة مصغرة
+                        </text>
+                      </svg>
+                      <div class="card-body">
+                        <p class="card-text">
+                          هذه بطاقة أوسع مع نص داعم أدناه كمقدمة طبيعية لمحتوى
+                          إضافي. هذا المحتوى أطول قليلاً.
+                        </p>
+                        <div
+                          class="d-flex justify-content-between align-items-center"
+                        >
+                          <div class="btn-group">
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-secondary"
+                            >
+                              عرض
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-secondary"
+                            >
+                              تعديل
+                            </button>
+                          </div>
+                          <small class="text-body-secondary">9 دقائق</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col">
+                    <div class="card shadow-sm">
+                      <svg
+                        class="bd-placeholder-img card-img-top"
+                        width="100%"
+                        height="225"
+                        xmlns="http://www.w3.org/2000/svg"
+                        role="img"
+                        aria-label="Placeholder: صورة مصغرة"
+                        preserveAspectRatio="xMidYMid slice"
+                        focusable="false"
+                      >
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#55595c"></rect>
+                        <text x="50%" y="50%" fill="#eceeef" dy=".3em">
+                          صورة مصغرة
+                        </text>
+                      </svg>
+                      <div class="card-body">
+                        <p class="card-text">
+                          هذه بطاقة أوسع مع نص داعم أدناه كمقدمة طبيعية لمحتوى
+                          إضافي. هذا المحتوى أطول قليلاً.
+                        </p>
+                        <div
+                          class="d-flex justify-content-between align-items-center"
+                        >
+                          <div class="btn-group">
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-secondary"
+                            >
+                              عرض
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-secondary"
+                            >
+                              تعديل
+                            </button>
+                          </div>
+                          <small class="text-body-secondary">9 دقائق</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+        <!-- Orders container -->
+        <article id="orders" class="content-section row" style="display: none">
+          <div style="margin-top: 10px">
+            <h3>Orders</h3>
+            <hr />
+            <table id="ordersTable" class="display" style="width: 100%">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Time</th>
+                  <th>Date</th>
+                  <th>Order Id</th>
+                  <th>Total price</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Wagih</td>
+                  <td>10:30</td>
+                  <td>2011-04-25</td>
+                  <td>616</td>
+                  <td>18 Euro</td>
+                  <td>
+                    <a
+                      href="#"
+                      class="btn btn-primary my-2"
+                      data-bs-toggle="modal"
+                      data-bs-target="#viewOrderModal"
+                      onclick="viewOrder()"
+                      >View Order</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div
+            class="modal fade"
+            id="viewOrderModal"
+            tabindex="-1"
+            aria-labelledby="viewOrderLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">
+                    Order Details
+                  </h1>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div class="modal-body">
+                  <form
+                    class="item"
+                    action="/add-item"
+                    method="post"
+                    enctype="multipart/form-data"
+                  >
+                    <div class="modal-footer row">
+                      <button
+                        type="submit"
+                        name="button"
+                        class="btn btn-outline-primary"
+                      >
+                        Confirm Order
+                      </button>
+                      <button
+                        type="submit"
+                        name="button"
+                        class="btn btn-outline-danger"
+                      >
+                        Refuse Order
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- ordersHistory container -->
+        <article
+          id="ordersHistory"
+          class="content-section row"
+          style="display: none"
+        >
+          <div style="margin-top: 10px">
+            <h3>Orders History</h3>
+            <hr />
+            <table id="ordersHistoryTable" class="display" style="width: 100%">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Time</th>
+                  <th>Date</th>
+                  <th>Order Id</th>
+                  <th>Total price</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Wagih</td>
+                  <td>10:30</td>
+                  <td>2011-04-25</td>
+                  <td>616</td>
+                  <td>18 Euro</td>
+                  <td>
+                    <a
+                      href="#"
+                      class="btn btn-primary my-2"
+                      data-bs-toggle="modal"
+                      data-bs-target="#viewOrderHistoryModal"
+                      onclick="viewOrder()"
+                      >View Order</a
+                    >
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div
+            class="modal fade"
+            id="viewOrderHistoryModal"
+            tabindex="-1"
+            aria-labelledby="viewOrderHistoryLabel"
+            aria-hidden="true"
+          >
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">
+                    Order Details
+                  </h1>
+                  <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div class="modal-body">
+                  <form
+                    class="item"
+                    action="/add-item"
+                    method="post"
+                    enctype="multipart/form-data"
+                  >
+                    <div class="modal-footer row">
+                      <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal"
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <section id="contact" class="gradient-background">
+      <div class="container">
+        <footer
+          class="row row-cols-1 row-cols-sm-2 row-cols-md-5 py-5 mt-5 border-top"
+        >
+          <div class="col mb-3">
+            <p class="text-body-secondary">© Lieferspatz</p>
+          </div>
+
+          <div class="col mb-3"></div>
+
+          <div class="col mb-3">
+            <h5>Section</h5>
+            <ul class="nav flex-column">
+              <li class="nav-item mb-2">
+                <a href="#title" class="nav-link p-0 text-body-secondary"
+                  >Home</a
+                >
+              </li>
+              <li class="nav-item mb-2">
+                <a href="#features" class="nav-link p-0 text-body-secondary"
+                  >Features</a
+                >
+              </li>
+              <li class="nav-item mb-2">
+                <a href="#" class="nav-link p-0 text-body-secondary">Pricing</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="#" class="nav-link p-0 text-body-secondary">FAQs</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="#" class="nav-link p-0 text-body-secondary">About</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col mb-3">
+            <h5>Section</h5>
+            <ul class="nav flex-column">
+              <li class="nav-item mb-2">
+                <a href="#" class="nav-link p-0 text-body-secondary">Home</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="#" class="nav-link p-0 text-body-secondary"
+                  >Features</a
+                >
+              </li>
+              <li class="nav-item mb-2">
+                <a href="#" class="nav-link p-0 text-body-secondary">Pricing</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="#" class="nav-link p-0 text-body-secondary">FAQs</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="#" class="nav-link p-0 text-body-secondary">About</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="col mb-3">
+            <h5>Section</h5>
+            <ul class="nav flex-column">
+              <li class="nav-item mb-2">
+                <a href="/" class="nav-link p-0 text-body-secondary">Home</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="/" class="nav-link p-0 text-body-secondary">Sign in</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="#" class="nav-link p-0 text-body-secondary"
+                  >Register</a
+                >
+              </li>
+              <li class="nav-item mb-2">
+                <a href="#" class="nav-link p-0 text-body-secondary">FAQs</a>
+              </li>
+              <li class="nav-item mb-2">
+                <a href="#" class="nav-link p-0 text-body-secondary">About</a>
+              </li>
+            </ul>
+          </div>
+        </footer>
+      </div>
+    </section>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        var sidebarLinks = document.querySelectorAll(".nav-link");
+
+        sidebarLinks.forEach(function (link) {
+          link.addEventListener("click", function (event) {
+            event.preventDefault();
+
+            // Remove the "active" class from all links
+            sidebarLinks.forEach(function (link) {
+              link.classList.remove("active");
+            });
+
+            // Add the "active" class to the clicked link
+            link.classList.add("active");
+
+            // Get the content ID from the clicked link's href
+            var contentId = link.getAttribute("href").substring(1);
+
+            // Show or hide content sections based on the clicked link
+            var contentSections = document.querySelectorAll(".content-section");
+            contentSections.forEach(function (section) {
+              section.style.display =
+                section.id === contentId ? "block" : "none";
+            });
+          });
+        });
+      });
+
+      function addItem() {
+        // Create a new card element
+        var newCard = `
+      <div class="col">
+        <div class="card shadow-sm">
+          <svg
+                        class="bd-placeholder-img card-img-top"
+                        width="100%"
+                        height="225"
+                        xmlns="http://www.w3.org/2000/svg"
+                        role="img"
+                        aria-label="Placeholder: صورة مصغرة"
+                        preserveAspectRatio="xMidYMid slice"
+                        focusable="false"
+                      >
+                        <title>Placeholder</title>
+                        <rect width="100%" height="100%" fill="#55595c"></rect>
+                        <text x="50%" y="50%" fill="#eceeef" dy=".3em">
+                          صورة مصغرة
+                        </text>
+                      </svg>
+                      <div class="card-body">
+                        <p class="card-text">
+                          هذه بطاقة أوسع مع نص داعم أدناه كمقدمة طبيعية لمحتوى
+                          إضافي. هذا المحتوى أطول قليلاً.
+                        </p>
+                        <div
+                          class="d-flex justify-content-between align-items-center"
+                        >
+                          <div class="btn-group">
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-primary"
+                            >
+                              View
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-success"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              class="btn btn-sm btn-outline-danger"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                          <large class="text-body-secondary">9 دقائق</large>
+                        </div>
+                      </div>        </div>
+      </div>
+    `;
+
+        // Append the new card to the container
+        $(".row-cols-1.row-cols-sm-2.row-cols-md-3.g-3").append(newCard);
+      }
+
+      new DataTable("#ordersTable");
+
+      new DataTable("#ordersHistoryTable");
+    </script>
+  </body>
+</html>
