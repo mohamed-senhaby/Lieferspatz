@@ -73,107 +73,61 @@
 
             <div class="col-lg-6 px-0">
                 <h1 id="restaurantName" class="display-4 fw-semibold text-white">
-                    mezzooo
+                    <%= restaurant.RestaurantName %>
                 </h1>
-                <p class="lead my-3">Multiple lines of text that form the lede, informing new readers quickly and
-                    efficiently about what’s most interesting in this post’s contents.</p>
+                <p class="lead my-3">
+                    <%= restaurant.description %>
+                </p>
             </div>
 
             <div class="col-lg-6 d-none d-lg-block mt-5 ">
-                <img src="images/burger.jpg" alt="burger" width="25%" class="resturant-logo " />
-            </div>
+                <img src="/images/<%= restaurant.image %>" alt="<%= restaurant.RestaurantName %>" width="25%"
+                    class="resturant-logo" />
 
-        </div>
-
-        <div class="row mb-2">
-            <div class="col-md-12">
-                <div
-                    class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-                    <div class="col p-4 d-flex flex-column position-static">
-                        <h3 class="mb-0 text-white">Featured post</h3>
-                        <div class="mb-1 text-body-secondary">Nov 12</div>
-                        <p class="card-text mb-auto">This is a wider card with supporting text below as a natural
-                            lead-in to additional content.</p>
-                        <a href="#" class="icon-link gap-1 icon-link-hover stretched-link">
-                            Continue reading
-                            <svg class="bi">
-                                <use xlink:href="#chevron-right"></use>
-                            </svg>
-                        </a>
-                    </div>
-                    <div class="col-auto d-none d-lg-block">
-                        <svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg"
-                            role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice"
-                            focusable="false">
-                            <image href="images/burger.jpg" alt="burger" class="bd-placeholder-img card-img-top"
-                                width="100%" height="100%" />
-                        </svg>
-                    </div>
-                </div>
             </div>
         </div>
+
 
         <div class="row mb-2">
-            <div class="col-md-12">
-                <div
-                    class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-                    <div class="col p-4 d-flex flex-column position-static">
-                        <h3 class="mb-0 text-white">Featured post</h3>
-                        <div class="mb-1 text-body-secondary">Nov 12</div>
-                        <p class="card-text mb-auto">This is a wider card with supporting text below as a natural
-                            lead-in to additional content.</p>
-                        <a href="#" class="icon-link gap-1 icon-link-hover stretched-link">
-                            Continue reading
-                            <svg class="bi">
-                                <use xlink:href="#chevron-right"></use>
-                            </svg>
-                        </a>
-                    </div>
-                    <div class="col-auto d-none d-lg-block">
-                        <svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg"
-                            role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice"
-                            focusable="false">
-                            <image href="images/burger.jpg" alt="burger" class="bd-placeholder-img card-img-top"
-                                width="100%" height="100%" />
-                        </svg>
+            <% items.forEach(item=> { %>
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm">
+                        <img src="/images/<%= item.image %>" alt="<%= item.itemName %>" class="card-img-top"
+                            width="100%" height="225">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                <%= item.itemName %>
+                            </h5>
+                            <p class="card-text">
+                                <%= item.description %>
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-muted">$<%= item.itemPrice %></span>
+                                <button class="add-to-cart-btn"
+                                    onclick="addToCart('<%= item.itemName %>', `<%= item.itemPrice %>`)">
+                                    Add to Cart
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+                <% }); %>
         </div>
 
-        <div class="row mb-2">
-            <div class="col-md-12">
-                <div
-                    class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-                    <div class="col p-4 d-flex flex-column position-static">
-                        <h3 class="mb-0 text-white">Featured post</h3>
-                        <div class="mb-1 text-body-secondary">Nov 12</div>
-                        <p class="card-text mb-auto">This is a wider card with supporting text below as a natural
-                            lead-in to additional content.</p>
-                        <a href="#" class="icon-link gap-1 icon-link-hover stretched-link">
-                            Continue reading
-                            <svg class="bi">
-                                <use xlink:href="#chevron-right"></use>
-                            </svg>
-                        </a>
-                    </div>
-                    <div class="col-auto d-none d-lg-block">
-                        <svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg"
-                            role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice"
-                            focusable="false">
-                            <image href="images/burger.jpg" alt="burger" class="bd-placeholder-img card-img-top"
-                                width="100%" height="100%" />
-                        </svg>
-                    </div>
-                </div>
-            </div>
-        </div>
+
 
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>
+    <script>
+        function addToCart(itemName, itemPrice) {
+            // You can implement the logic to add the item to the customer's cart here
+            // For simplicity, let's just log the details to the console
+            console.log(`Added ${itemName} to the cart. Price: $${itemPrice}`);
+        }
+    </script>
 </body>
 
 </html>

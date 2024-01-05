@@ -92,28 +92,34 @@
 
 
     <main class="container">
+        <form class="item" action="/add-item" method="post">
 
-        <form class="item" action="/add-item" method="post" enctype="multipart/form-data">
-            <label for="item-name">Item Name</label>
-            <input type="text" name="item-name" class="form-control" id="item-name" />
+            <label for="itemName">Item Name</label>
+            <input type="text" name="itemName" class="form-control" id="itemName" />
 
-            <label for="item-price">Item Price</label>
-            <input type="text" name="item-price" class="form-control" id="item-price" />
+            <label for="itemPrice">Item Price</label>
+            <input type="number" name="itemPrice" class="form-control" id="itemPrice" />
 
             <label for="image">Choose an Image</label>
             <input type="file" name="image" accept="image/*" class="form-control" id="image" />
 
             <label for="category">Select a Category</label>
             <select name="category" id="category" class="form-control">
-                <option value="category1">Drinks</option>
-                <option value="category2">Meals</option>
-
+                <option value="Drinks">Drinks</option>
+                <option value="Meals">Meals</option>
             </select>
 
-            <label for="post">Description</label>
-            <textarea name="post" class="form-control" id="floatingTextarea"></textarea>
+            <label for="description">Description</label>
+            <textarea name="description" class="form-control" id="description"></textarea>
 
-            <button type="submit" name="button" class="btn btn-primary">Submit</button>
+            <div class="modal-footer row">
+                <button type="submit" name="button" class="btn btn-primary">
+                    Submit
+                </button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                    Close
+                </button>
+            </div>
         </form>
 
 
