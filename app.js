@@ -15,6 +15,7 @@ app.set("view engine", "ejs");
 const port = process.env.PORT;
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 
 app.use(
   session({
@@ -67,6 +68,26 @@ const db = new sqlite3.Database(__dirname + "/database.db", (err) => {
       category TEXT,
       description TEXT,
       FOREIGN KEY (restaurant_id) REFERENCES users (id)
+    );
+    
+`);
+
+    db.run(`
+    CREATE TABLE IF NOT EXISTS orders (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      restaurant_id INTEGER,
+      user_id INTEGER,
+      item_id INTEGER,
+      item_name TEXT,
+      quantity INTEGER,
+      total_price INTEGER,
+      order_status TEXT DEFAULT 'In Progress',
+      order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      order_date_date DATE, 
+      order_date_time TIME,
+      FOREIGN KEY (restaurant_id) REFERENCES users (id),
+      FOREIGN KEY (user_id) REFERENCES users (id),
+      FOREIGN KEY (item_id) REFERENCES items (id)
     );
     
 `);
@@ -159,10 +180,10 @@ app.post("/register", (req, res) => {
       } else {
         console.log(`${userType} Data inserted successfully`);
 
-        if (req.body.userType === "restaurantOwner") {
+        if (userType === "restaurantOwner") {
           res.redirect("/DashboardRest");
         } else {
-          res.redirect("/restaurants");
+          res.redirect("/signin");
         }
       }
     }
@@ -172,7 +193,6 @@ app.post("/register", (req, res) => {
 app.get("/resturant-profile/:id", (req, res) => {
   const restaurantId = req.params.id;
 
-  // Fetch restaurant data
   db.get(
     "SELECT * FROM users WHERE id = ?",
     [restaurantId],
@@ -184,11 +204,9 @@ app.get("/resturant-profile/:id", (req, res) => {
         );
         res.status(500).send("Internal Server Error");
       } else {
-        // Check if restaurant data is found
         if (!restaurant) {
           res.status(404).send("Restaurant not found");
         } else {
-          // Fetch items associated with the restaurant
           db.all(
             "SELECT * FROM items WHERE restaurant_id = ?",
             [restaurantId],
@@ -197,7 +215,6 @@ app.get("/resturant-profile/:id", (req, res) => {
                 console.error("Error retrieving items from the database:", err);
                 res.status(500).send("Internal Server Error");
               } else {
-                // Render the template and pass the restaurant and items data
                 res.render("resturant-profile.ejs", { restaurant, items });
               }
             }
@@ -211,6 +228,48 @@ app.get("/resturant-profile/:id", (req, res) => {
 app.get("/register", (req, res) => {
   try {
     res.render("register.ejs");
+  } catch (error) {
+    console.error("Error retrieving items:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/checkout", (req, res) => {
+  try {
+    const signedInUser = req.session.user;
+
+    if (!signedInUser) {
+      console.error("User not authenticated");
+      return res.redirect("/signin");
+    }
+
+    const userId = signedInUser.id;
+
+    const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+
+    db.all(
+      // the O is only because i want here to get a specific column..
+      `
+      SELECT *
+      FROM orders o 
+      WHERE user_id = ? AND order_date_date = ? AND order_date_time <= ?
+      AND NOT EXISTS (
+        SELECT 1
+        FROM orders
+        WHERE user_id = o.user_id AND item_id = o.item_id
+          AND order_date_date = ? AND order_date_time > o.order_date_time
+      )
+      `,
+      [userId, now.split(" ")[0], now.split(" ")[1], now.split(" ")[0]],
+      (err, orders) => {
+        if (err) {
+          console.error("Error retrieving user orders from the database:", err);
+          return res.status(500).send("Internal Server Error");
+        }
+
+        res.render("checkout.ejs", { orders });
+      }
+    );
   } catch (error) {
     console.error("Error retrieving items:", error);
     res.status(500).send("Internal Server Error");
@@ -297,14 +356,24 @@ app.get("/DashboardRest", (req, res) => {
       (err, items) => {
         if (err) {
           console.error("Error retrieving items from the database:", err);
-          res.status(500).send("Internal Server Error");
-        } else {
-          // Render the view with both restaurant name and items
-          res.render("DashboardRest.ejs", {
-            restaurantName: signedInRestaurantName,
-            items: items,
-          });
+          return res.status(500).send("Internal Server Error");
         }
+
+        db.all(
+          `SELECT * FROM orders WHERE restaurant_id = ${signedInUser.id}`,
+          (err, orders) => {
+            if (err) {
+              console.error("Error retrieving orders from the database:", err);
+              return res.status(500).send("Internal Server Error");
+            }
+
+            res.render("DashboardRest.ejs", {
+              restaurantName: signedInRestaurantName,
+              items: items,
+              orders: orders,
+            });
+          }
+        );
       }
     );
   } catch (error) {
@@ -346,41 +415,6 @@ app.post("/add-item", (req, res) => {
   );
 });
 
-app.get("/users", (req, res) => {
-  db.all("SELECT * FROM users", (err, rows) => {
-    if (err) {
-      res.status(500).send("Internal Server Error");
-    } else {
-      res.status(200).json(rows);
-    }
-  });
-});
-
-app.get("/items", (req, res) => {
-  db.all("SELECT * FROM items", (err, rows) => {
-    if (err) {
-      res.status(500).send("Internal Server Error");
-    } else {
-      res.status(200).json(rows);
-    }
-  });
-});
-
-app.get("/users/:id", (req, res) => {
-  const userId = req.params.id;
-
-  db.run("DELETE FROM users WHERE id = ?", [userId], (err) => {
-    if (err) {
-      console.error("Error deleting user from database:", err);
-      res.status(500).send("Internal Server Error");
-    } else {
-      console.log(`User with ID ${userId} deleted successfully`);
-      res.redirect("/users");
-    }
-  });
-});
-
-// Add route to handle updating items
 app.post("/update-item/:id", (req, res) => {
   const itemId = req.params.id;
   const {
@@ -432,7 +466,6 @@ app.delete("/delete-item/:id", (req, res) => {
   });
 });
 
-// Change the route to handle both GET and POST requests
 app.all("/delete-menu", (req, res) => {
   const restaurantId = req.session.user ? req.session.user.id : null;
 
@@ -457,10 +490,150 @@ app.all("/delete-menu", (req, res) => {
       }
     );
   } else {
-    // Handle GET request (if needed)
-    // You can render a page or provide some information for GET requests
     res.status(405).send("Method Not Allowed");
   }
+});
+
+app.post("/saveCart", (req, res) => {
+  const cartItems = req.body.items;
+  const userId = req.session.user ? req.session.user.id : null;
+
+  if (!userId) {
+    console.error("User not authenticated");
+    return res.status(401).send("Unauthorized");
+  }
+
+  let counter = 0;
+
+  const processCartItem = () => {
+    const item = cartItems[counter];
+
+    if (!item) {
+      console.log("Orders placed successfully");
+      return res.status(200).json({ message: "Orders placed successfully" });
+    }
+
+    const { name, price, count } = item;
+
+    db.get(
+      "SELECT restaurant_id, id AS item_id FROM items WHERE itemName = ? AND itemPrice = ?",
+      [name, price],
+      (err, itemData) => {
+        if (err) {
+          console.error("Error fetching item details:", err);
+          return res.status(500).send("Internal Server Error");
+        }
+
+        if (!itemData) {
+          console.error("Item not found in the database");
+          return res.status(404).send("Item not found");
+        }
+
+        const { restaurant_id, item_id } = itemData;
+        const total_price = price * count;
+
+        db.run(
+          `
+          INSERT OR IGNORE INTO orders (restaurant_id, user_id, item_id, item_name, quantity, total_price, order_status, order_date, order_date_date, order_date_time)
+          VALUES (?, ?, ?, ?, ?, ?, 'In Progress', CURRENT_TIMESTAMP, DATE(CURRENT_TIMESTAMP), TIME(CURRENT_TIMESTAMP))
+          `,
+          [restaurant_id, userId, item_id, name, count, total_price],
+          (insertErr) => {
+            if (insertErr) {
+              console.error(
+                "Error inserting or ignoring order into the database:",
+                insertErr
+              );
+              return res.status(500).send("Internal Server Error");
+            }
+
+            counter++;
+            processCartItem();
+          }
+        );
+      }
+    );
+  };
+
+  processCartItem();
+});
+
+app.get("/users", (req, res) => {
+  db.all("SELECT * FROM users", (err, rows) => {
+    if (err) {
+      res.status(500).send("Internal Server Error");
+    } else {
+      res.status(200).json(rows);
+    }
+  });
+});
+
+app.get("/users/:id", (req, res) => {
+  const userId = req.params.id;
+
+  db.run("DELETE FROM users WHERE id = ?", [userId], (err) => {
+    if (err) {
+      console.error("Error deleting user from database:", err);
+      res.status(500).send("Internal Server Error");
+    } else {
+      console.log(`User with ID ${userId} deleted successfully`);
+      res.redirect("/users");
+    }
+  });
+});
+
+app.get("/orders/:id", (req, res) => {
+  const orderID = req.params.id;
+
+  db.run("DELETE FROM orders WHERE id = ?", [orderID], (err) => {
+    if (err) {
+      console.error("Error deleting user from database:", err);
+      res.status(500).send("Internal Server Error");
+    } else {
+      console.log(`User with ID ${orderID} deleted successfully`);
+      res.redirect("/orders");
+    }
+  });
+});
+
+app.get("/orders", (req, res) => {
+  db.all("SELECT * FROM orders", (err, rows) => {
+    if (err) {
+      res.status(500).send("Internal Server Error");
+    } else {
+      res.status(200).json(rows);
+    }
+  });
+});
+
+app.get("/items", (req, res) => {
+  db.all("SELECT * FROM items", (err, rows) => {
+    if (err) {
+      res.status(500).send("Internal Server Error");
+    } else {
+      res.status(200).json(rows);
+    }
+  });
+});
+
+app.put("/update-order-status/:id", (req, res) => {
+  const orderId = req.params.id;
+  const newStatus = req.body.newStatus;
+
+  db.run(
+    "UPDATE orders SET order_status = ? WHERE id = ?",
+    [newStatus, orderId],
+    (err) => {
+      if (err) {
+        console.error("Error updating order status in the database:", err);
+        res
+          .status(500)
+          .json({ success: false, error: "Internal Server Error" });
+      } else {
+        res.json({ success: true });
+      }
+    }
+  );
 });
 
 app.listen(port, () => {

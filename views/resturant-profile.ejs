@@ -1,36 +1,406 @@
 <!-- views/restaurant.ejs -->
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" type="text/css" href="styles/style.css">
+    <link type="text/css" rel="stylesheet" id="dark-mode-custom-link" />
+    <link type="text/css" rel="stylesheet" id="dark-mode-general-link" />
+    <style lang="en" type="text/css" id="dark-mode-custom-style"></style>
+    <style lang="en" type="text/css" id="dark-mode-native-style"></style>
+    <style lang="en" type="text/css" id="dark-mode-native-sheet"></style>
+    <link rel="stylesheet" href="//cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" />
+
+    <script>
+        /*!
+         * Color mode toggler for Bootstrap's docs (https://getbootstrap.com/)
+         * Copyright 2011-2023 The Bootstrap Authors
+         * Licensed under the Creative Commons Attribution 3.0 Unported License.
+         */
+
+        (() => {
+            "use strict";
+
+            const getStoredTheme = () => localStorage.getItem("theme");
+            const setStoredTheme = (theme) => localStorage.setItem("theme", theme);
+
+            const getPreferredTheme = () => {
+                const storedTheme = getStoredTheme();
+                if (storedTheme) {
+                    return storedTheme;
+                }
+
+                return window.matchMedia("(prefers-color-scheme: dark)").matches
+                    ? "dark"
+                    : "light";
+            };
+
+            const setTheme = (theme) => {
+                if (
+                    theme === "auto" &&
+                    window.matchMedia("(prefers-color-scheme: dark)").matches
+                ) {
+                    document.documentElement.setAttribute("data-bs-theme", "dark");
+                } else {
+                    document.documentElement.setAttribute("data-bs-theme", theme);
+                }
+            };
+
+            setTheme(getPreferredTheme());
+
+            const showActiveTheme = (theme, focus = false) => {
+                const themeSwitcher = document.querySelector("#bd-theme");
+
+                if (!themeSwitcher) {
+                    return;
+                }
+
+                const themeSwitcherText = document.querySelector("#bd-theme-text");
+                const activeThemeIcon = document.querySelector(
+                    ".theme-icon-active use"
+                );
+                const btnToActive = document.querySelector(
+                    `[data-bs-theme-value="${theme}"]`
+                );
+                const svgOfActiveBtn = btnToActive
+                    .querySelector("svg use")
+                    .getAttribute("href");
+
+                document
+                    .querySelectorAll("[data-bs-theme-value]")
+                    .forEach((element) => {
+                        element.classList.remove("active");
+                        element.setAttribute("aria-pressed", "false");
+                    });
+
+                btnToActive.classList.add("active");
+                btnToActive.setAttribute("aria-pressed", "true");
+                activeThemeIcon.setAttribute("href", svgOfActiveBtn);
+                const themeSwitcherLabel = `${themeSwitcherText.textContent} (${btnToActive.dataset.bsThemeValue})`;
+                themeSwitcher.setAttribute("aria-label", themeSwitcherLabel);
+
+                if (focus) {
+                    themeSwitcher.focus();
+                }
+            };
+
+            window
+                .matchMedia("(prefers-color-scheme: dark)")
+                .addEventListener("change", () => {
+                    const storedTheme = getStoredTheme();
+                    if (storedTheme !== "light" && storedTheme !== "dark") {
+                        setTheme(getPreferredTheme());
+                    }
+                });
+
+            window.addEventListener("DOMContentLoaded", () => {
+                showActiveTheme(getPreferredTheme());
+
+                document
+                    .querySelectorAll("[data-bs-theme-value]")
+                    .forEach((toggle) => {
+                        toggle.addEventListener("click", () => {
+                            const theme = toggle.getAttribute("data-bs-theme-value");
+                            setStoredTheme(theme);
+                            setTheme(theme);
+                            showActiveTheme(theme, true);
+                        });
+                    });
+            });
+        })();
+    </script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3" />
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous" />
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="" />
+
     <title>restaurant</title>
+
+    <link href="https://getbootstrap.com/docs/5.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous" />
+
+    <meta name="theme-color" content="#712cf9" />
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+
+        .b-example-divider {
+            width: 100%;
+            height: 3rem;
+            background-color: rgba(0, 0, 0, 0.1);
+            border: solid rgba(0, 0, 0, 0.15);
+            border-width: 1px 0;
+            box-shadow: inset 0 0.5em 1.5em rgba(0, 0, 0, 0.1),
+                inset 0 0.125em 0.5em rgba(0, 0, 0, 0.15);
+        }
+
+        .b-example-vr {
+            flex-shrink: 0;
+            width: 1.5rem;
+            height: 100vh;
+        }
+
+        .bi {
+            vertical-align: -0.125em;
+            fill: currentColor;
+        }
+
+        .nav-scroller {
+            position: relative;
+            z-index: 2;
+            height: 2.75rem;
+            overflow-y: hidden;
+        }
+
+        .nav-scroller .nav {
+            display: flex;
+            flex-wrap: nowrap;
+            padding-bottom: 1rem;
+            margin-top: -1px;
+            overflow-x: auto;
+            text-align: center;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .btn-bd-primary {
+            --bd-violet-bg: #712cf9;
+            --bd-violet-rgb: 112.520718, 44.062154, 249.437846;
+
+            --bs-btn-font-weight: 600;
+            --bs-btn-color: var(--bs-white);
+            --bs-btn-bg: var(--bd-violet-bg);
+            --bs-btn-border-color: var(--bd-violet-bg);
+            --bs-btn-hover-color: var(--bs-white);
+            --bs-btn-hover-bg: #6528e0;
+            --bs-btn-hover-border-color: #6528e0;
+            --bs-btn-focus-shadow-rgb: var(--bd-violet-rgb);
+            --bs-btn-active-color: var(--bs-btn-hover-color);
+            --bs-btn-active-bg: #5a23c8;
+            --bs-btn-active-border-color: #5a23c8;
+        }
+
+        .bd-mode-toggle {
+            z-index: 1500;
+        }
+
+        .bd-mode-toggle .dropdown-menu .active .bi {
+            display: block !important;
+        }
+
+        .container {
+            max-width: 100%;
+        }
+
+        .icon-link>.bi {
+            width: 0.75em;
+            height: 0.75em;
+        }
+
+        /*
+ * Custom translucent site header
+ */
+
+        .site-header {
+            background-color: rgba(0, 0, 0, 0.85);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            backdrop-filter: saturate(180%) blur(20px);
+        }
+
+        .site-header a {
+            color: #8e8e8e;
+            transition: color 0.15s ease-in-out;
+        }
+
+        .site-header a:hover {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        /*
+ * Dummy devices (replace them with your own or something else entirely!)
+ */
+
+        .product-device {
+            position: absolute;
+            right: 10%;
+            bottom: -30%;
+            width: 300px;
+            height: 540px;
+            background-color: #333;
+            border-radius: 21px;
+            transform: rotate(30deg);
+        }
+
+        .product-device::before {
+            position: absolute;
+            top: 10%;
+            right: 10px;
+            bottom: 10%;
+            left: 10px;
+            content: "";
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+
+        .product-device-2 {
+            top: -25%;
+            right: auto;
+            bottom: 0;
+            left: 5%;
+            background-color: #e5e5e5;
+        }
+
+        /*
+ * Extra utilities
+ */
+
+        .flex-equal>* {
+            flex: 1;
+        }
+
+        @media (min-width: 768px) {
+            .flex-md-equal>* {
+                flex: 1;
+            }
+        }
+
+        /* .navbar {
+        background-color: var(--navbar-bg-light);
+        color: var(--navbar-text-light);
+      } */
+
+        /* .navbar-dark #cart {
+        background-color: var(--navbar-text-light);
+   
+      }
+
+      .navbar-light #cart {
+        background-color: var(--navbar-text-dark);
+      }
+
+      #cart {
+        border-color: var(--navbar-text-light);
+      }
+
+      #cart :hover {
+        background-color: var(--navbar-bg-dark);
+      }
+
+      #cart {
+        filter: invert(1);
+      } */
+
+        #cart {
+            padding: 8px 16px;
+            border: 1px solid var(--cart-border);
+            border-radius: 4px;
+            background-color: var(--cart-bg);
+            color: var(--cart-text);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            cursor: pointer;
+        }
+
+        #cart:hover {
+            background-color: var(--cart-hover-bg);
+            color: var(--cart-hover-text);
+        }
+
+        .navbar-dark #cart {
+            filter: invert(1);
+        }
+
+        /* Define custom properties for easy theme adjustments */
+        :root {
+            --cart-border: var(--navbar-text-light);
+            --cart-bg: var(--navbar-bg-light);
+            --cart-text: var(--navbar-text-light);
+            --cart-hover-bg: var(--navbar-bg-dark);
+            --cart-hover-text: var(--navbar-text-dark);
+        }
+
+        /* Adjust properties for dark theme */
+        .navbar-dark {
+            --cart-border: var(--navbar-text-dark);
+            --cart-bg: var(--navbar-bg-dark);
+            --cart-text: var(--navbar-text-dark);
+            --cart-hover-bg: var(--navbar-bg-light);
+            --cart-hover-text: var(--navbar-text-light);
+        }
+
+        #mainArticle {
+            margin-top: 15vh;
+            margin-bottom: 3vh;
+            border-radius: 5px;
+            height: 84vh;
+        }
+
+        .show-cart li {
+            display: flex;
+        }
+    </style>
+
+
 </head>
 
-<body class="gradient-background " id="restaurant">
-
+<body>
     <header>
         <nav class="navbar bg-body-tertiary fixed-top">
             <div class="container-fluid">
                 <a class="navbar-brand" href="./main.html">Lieferspatz</a>
-                <form class="d-flex mt-0" role="search">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success" type="submit">Search</button>
+                <form class="d-flex mx-auto" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+                    <button class="btn btn-outline-primary" type="submit">
+                        Search
+                    </button>
                 </form>
+
+                <div>
+                    <a href="#0" id="cart" style="float: right !important ; margin-right: 30px" data-bs-toggle="modal"
+                        data-bs-target="#cartModal">
+                        <span>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor"
+                                class="bi bi-cart" viewBox="0 0 16 16">
+                                <path
+                                    d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2" />
+                            </svg>
+                        </span>
+
+                        <span
+                            class="total-count position-absolute translate-middle badge rounded-pill bg-primary badge-sm">
+                            <span class="visually-hidden">unread messages</span>
+                        </span>
+                    </a>
+                </div>
+
                 <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
+
                 <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar"
                     aria-labelledby="offcanvasNavbarLabel">
                     <div class="offcanvas-header">
-                        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Lieferspatz</h5>
+                        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">
+                            Lieferspatz
+                        </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                     </div>
 
@@ -49,17 +419,23 @@
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" href="#">Action</a></li>
-                                    <li><a class="dropdown-item" href="#">Another action</a></li>
                                     <li>
-                                        <hr class="dropdown-divider">
+                                        <a class="dropdown-item" href="#">Another action</a>
                                     </li>
-                                    <li><a class="dropdown-item" href="#">Something else here</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider" />
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#">Something else here</a>
+                                    </li>
                                 </ul>
                             </li>
                         </ul>
                         <form class="d-flex mt-3" role="search">
-                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                            <button class="btn btn-outline-success" type="submit">Search</button>
+                            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+                            <button class="btn btn-outline-primary" type="submit">
+                                Search
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -67,67 +443,481 @@
         </nav>
     </header>
 
-    <main class="container">
+    <!-- dark and light mode button -->
+    <!-- <div class="dropdown position-fixed bottom-0 end-0 mb-3 me-3 bd-mode-toggle">
+        <button class="btn btn-bd-primary py-2 dropdown-toggle d-flex align-items-center" id="bd-theme" type="button"
+            aria-expanded="false" data-bs-toggle="dropdown" aria-label="Toggle theme (dark)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                class="bi bi-moon-stars-fill my-1 theme-icon-active" viewBox="0 0 16 16">
+                <path
+                    d="M6 .278a.77.77 0 0 1 .08.858 7.2 7.2 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277q.792-.001 1.533-.16a.79.79 0 0 1 .81.316.73.73 0 0 1-.031.893A8.35 8.35 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.75.75 0 0 1 6 .278" />
+                <path
+                    d="M10.794 3.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387a1.73 1.73 0 0 0-1.097 1.097l-.387 1.162a.217.217 0 0 1-.412 0l-.387-1.162A1.73 1.73 0 0 0 9.31 6.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387a1.73 1.73 0 0 0 1.097-1.097zM13.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.16 1.16 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.16 1.16 0 0 0-.732-.732l-.774-.258a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732z" />
+                <use href="#moon-stars-fill"></use>
+            </svg>
+            <span class="visually-hidden" id="bd-theme-text">Toggle theme</span>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="bd-theme-text" style="">
+            <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="light"
+                    aria-pressed="false">
+                    <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em">
+                        <use href="#sun-fill"></use>
+                    </svg>
+                    Light
+                    <svg class="bi ms-auto d-none" width="1em" height="1em">
+                        <use href="#check2"></use>
+                    </svg>
+                </button>
+            </li>
+            <li>
+                <button type="button" class="dropdown-item d-flex align-items-center active" data-bs-theme-value="dark"
+                    aria-pressed="true">
+                    <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em">
+                        <use href="#moon-stars-fill"></use>
+                    </svg>
+                    Dark
+                    <svg class="bi ms-auto d-none" width="1em" height="1em">
+                        <use href="#check2"></use>
+                    </svg>
+                </button>
+            </li>
+            <li>
+                <button type="button" class="dropdown-item d-flex align-items-center" data-bs-theme-value="auto"
+                    aria-pressed="false">
+                    <svg class="bi me-2 opacity-50 theme-icon" width="1em" height="1em">
+                        <use href="#circle-half"></use>
+                    </svg>
+                    Auto
+                    <svg class="bi ms-auto d-none" width="1em" height="1em">
+                        <use href="#check2"></use>
+                    </svg>
+                </button>
+            </li>
+        </ul>
+    </div> -->
+    <!--end of the dark and light mode button -->
 
-        <div class="row p-4 p-md-5 mb-4 rounded text-body-emphasis ">
+    <!-- Cart Modal -->
+    <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cartModalLabel">Cart</h5>
 
-            <div class="col-lg-6 px-0">
-                <h1 id="restaurantName" class="display-4 fw-semibold text-white">
-                    <%= restaurant.RestaurantName %>
-                </h1>
-                <p class="lead my-3">
-                    <%= restaurant.description %>
-                </p>
-            </div>
-
-            <div class="col-lg-6 d-none d-lg-block mt-5 ">
-                <img src="/images/<%= restaurant.image %>" alt="<%= restaurant.RestaurantName %>" width="25%"
-                    class="resturant-logo" />
-
+                </div>
+                <div class="modal-body">
+                    <table class="show-cart table"></table>
+                    <div>Total price: $<span class="total-cart"></span></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="orderNowBtn">Order now</button>
+                </div>
             </div>
         </div>
+    </div>
 
+    <main class="container">
+        <div class="position-relative overflow-hidden p-3 p-md-5 text-center bg-body-tertiary" id="mainArticle">
+            <div class="col-md-6 p-lg-5 mx-auto my-5">
+                <h1 class="display-3 fw-bold">
+                    <div class="row p-4 p-md-5 mb-4 rounded text-body-emphasis">
+                        <div class="col-lg-6 px-0 mt-2">
+                            <h2 id="restaurantName" class="display-4 bold">
+                                <%= restaurant.RestaurantName %>
+                            </h2>
+                        </div>
 
-        <div class="row mb-2">
-            <% items.forEach(item=> { %>
-                <div class="col-md-4">
-                    <div class="card mb-4 shadow-sm">
-                        <img src="/images/<%= item.image %>" alt="<%= item.itemName %>" class="card-img-top"
-                            width="100%" height="225">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <%= item.itemName %>
-                            </h5>
-                            <p class="card-text">
-                                <%= item.description %>
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-muted">$<%= item.itemPrice %></span>
-                                <button class="add-to-cart-btn"
-                                    onclick="addToCart('<%= item.itemName %>', `<%= item.itemPrice %>`)">
-                                    Add to Cart
-                                </button>
-                            </div>
+                        <div class="col-lg-6 d-lg-block">
+                            <img src="/images/<%= restaurant.image %>" alt="<%= restaurant.RestaurantName %>"
+                                width="35%" class="resturant-logo" style="border-radius: 3px" />
+                        </div>
+                    </div>
+                </h1>
+                <h3 class="fw-normal text-muted mb-3">
+                    <p class="lead my-3">
+                        <%= restaurant.description %>
+                    </p>
+                </h3>
+                <div class="d-flex gap-3 justify-content-center lead fw-normal">
+                    <a class="icon-link" href="#" data-bs-toggle="modal" data-bs-target="#restaurantModal">
+                        Learn more
+                        <svg class="bi">
+                            <use xlink:href="#chevron-right"></use>
+                        </svg>
+                    </a>
+                    <a class="icon-link" href="#Menu">
+                        Buy
+                        <svg class="bi">
+                            <use xlink:href="#chevron-right"></use>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <div class="product-device shadow-sm d-none d-md-block"></div>
+            <div class="product-device product-device-2 shadow-sm d-none d-md-block"></div>
+        </div>
+
+        <div class="modal fade" id="restaurantModal" tabindex="-1" aria-labelledby="restaurantLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">
+                            Restaurant details
+                        </h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <table id="restrauntDetails" class="display" style="width: 80%">
+
+                                <tbody>
+                                    <tr>
+                                        <th>RestaurantName</th>
+                                        <th>
+                                            <%= restaurant.RestaurantName %>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>
+                                            <%= restaurant.Category %>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>RestaurantAddress</th>
+                                        <th>
+                                            <%= restaurant.RestaurantAddress %>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>Restaurant PLZ</th>
+                                        <th>
+                                            <%= restaurant.RestaurantPostNumber %>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>openingTime</th>
+                                        <th>
+                                            <%= restaurant.openingTime %>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>closingTime</th>
+                                        <th>
+                                            <%= restaurant.closingTime %>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>RestaurantPhoneNumber</th>
+                                        <th>
+                                            <%= restaurant.RestaurantPhoneNumber %>
+                                        </th>
+                                    </tr>
+
+                                    <tr>
+                                        <th>RestaurantEmail</th>
+                                        <th>
+                                            <%= restaurant.RestaurantEmail %>
+                                        </th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="modal-footer row">
+                            <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">
+                                Close
+                            </button>
                         </div>
                     </div>
                 </div>
-                <% }); %>
+            </div>
         </div>
 
 
+        <div class="d-md-flex flex-md-equal w-100 my-md-3 ps-md-3" id="Menu">
+            <% items.forEach(item=> { %>
+                <div class="bg-success bg-gradient me-md-3 pt-3 px-3 pt-md-5 px-md-5 text-center overflow-hidden"
+                    style="border-radius: 10px">
+                    <div class="my-3 py-3">
+                        <h2 class="display-5 font-weight-bold">
+                            <%= item.itemName %>
+                        </h2>
+                        <p class="lead my-3">
+                            <%= item.description %>
+                        </p>
+                        <div class="col-lg-12">
+                            <h3 class="font-weight-bold">
+                                <%= item.itemPrice %> Euro
+                            </h3>
+
+                            <a href="#" data-name="<%= item.itemName %>" data-price="<%= item.itemPrice %>"
+                                class="add-to-cart btn btn-outline-light">Add to cart</a>
+                        </div>
+                    </div>
+                    <div class="bg-body-tertiary shadow-sm mx-auto overflow-hidden"
+                        style="width: 80%; height: 300px; border-radius: 21px 21px 0 0">
+                        <img src="/images/<%= item.image %>" alt="<%= item.itemName %>" width="580px" height="310px"
+                            style="border-radius: 10px" />
+                    </div>
+                </div>
+                <% }); %>
+
+        </div>
+
 
     </main>
+    <!-- Footer -->
+    <section id="contact" class="gradient-background">
+        <div class="container">
+            <footer class="row row-cols-1 row-cols-sm-2 row-cols-md-5 py-5 mt-5 border-top">
+                <div class="col mb-3">
+                    <p class="text-body-secondary">© Lieferspatz</p>
+                </div>
+
+                <div class="col mb-3"></div>
+
+                <div class="col mb-3">
+                    <h5>Section</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2">
+                            <a href="#title" class="nav-link p-0 text-body-secondary">Home</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#features" class="nav-link p-0 text-body-secondary">Features</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-body-secondary">Pricing</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-body-secondary">FAQs</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-body-secondary">About</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col mb-3">
+                    <h5>Section</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-body-secondary">Home</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-body-secondary">Features</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-body-secondary">Pricing</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-body-secondary">FAQs</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-body-secondary">About</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col mb-3">
+                    <h5>Section</h5>
+                    <ul class="nav flex-column">
+                        <li class="nav-item mb-2">
+                            <a href="/" class="nav-link p-0 text-body-secondary">Home</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="/" class="nav-link p-0 text-body-secondary">Sign in</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-body-secondary">Register</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-body-secondary">FAQs</a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="#" class="nav-link p-0 text-body-secondary">About</a>
+                        </li>
+                    </ul>
+                </div>
+            </footer>
+        </div>
+    </section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <!-- ... your existing HTML code ... -->
+
     <script>
-        function addToCart(itemName, itemPrice) {
-            // You can implement the logic to add the item to the customer's cart here
-            // For simplicity, let's just log the details to the console
-            console.log(`Added ${itemName} to the cart. Price: $${itemPrice}`);
+        // Shopping Cart API
+        const shoppingCart = (function () {
+            let cart = [];
+
+            function Item(name, price, count) {
+                this.name = name;
+                this.price = price;
+                this.count = count;
+            }
+
+            function saveCart() {
+                sessionStorage.setItem("shoppingCart", JSON.stringify(cart));
+            }
+
+            function loadCart() {
+                cart = JSON.parse(sessionStorage.getItem("shoppingCart")) || [];
+            }
+
+            loadCart();
+
+            return {
+                addItemToCart: function (name, price, count = 1) {
+                    const existingItem = cart.find(item => item.name === name);
+                    if (existingItem) {
+                        existingItem.count += count;
+                    } else {
+                        const newItem = new Item(name, price, count);
+                        cart.push(newItem);
+                    }
+                    saveCart();
+                },
+                setCountForItem: function (name, count) {
+                    const item = cart.find(item => item.name === name);
+                    if (item) {
+                        item.count = count;
+                        saveCart();
+                    }
+                },
+                removeItemFromCart: function (name) {
+                    const itemIndex = cart.findIndex(item => item.name === name);
+                    if (itemIndex !== -1) {
+                        cart[itemIndex].count--;
+                        if (cart[itemIndex].count === 0) {
+                            cart.splice(itemIndex, 1);
+                        }
+                        saveCart();
+                    }
+                },
+                removeItemFromCartAll: function (name) {
+                    cart = cart.filter(item => item.name !== name);
+                    saveCart();
+                },
+                clearCart: function () {
+                    cart = [];
+                    saveCart();
+                },
+                totalCount: function () {
+                    return cart.reduce((total, item) => total + item.count, 0);
+                },
+                totalCart: function () {
+                    return cart.reduce((total, item) => total + item.price * item.count, 0).toFixed(2);
+                },
+                listCart: function () {
+                    return cart.map(item => ({
+                        name: item.name,
+                        price: item.price,
+                        count: item.count,
+                        total: (item.price * item.count).toFixed(2)
+                    }));
+                }
+            };
+        })();
+
+        // Event handlers
+        $(".add-to-cart").click(function (event) {
+            event.preventDefault();
+            const name = $(this).data("name");
+            const price = Number($(this).data("price"));
+            shoppingCart.addItemToCart(name, price);
+            displayCart();
+        });
+
+        $(".show-cart").on("click", ".delete-item", function (event) {
+            const name = $(this).data("name");
+            shoppingCart.removeItemFromCartAll(name);
+            displayCart();
+        });
+
+        $(".show-cart").on("click", ".minus-item", function (event) {
+            const name = $(this).data("name");
+            shoppingCart.removeItemFromCart(name);
+            displayCart();
+        });
+
+        $(".show-cart").on("click", ".plus-item", function (event) {
+            const name = $(this).data("name");
+            shoppingCart.addItemToCart(name);
+            displayCart();
+        });
+
+        $(".show-cart").on("change", ".item-count", function (event) {
+            const name = $(this).data("name");
+            const count = Number($(this).val());
+            shoppingCart.setCountForItem(name, count);
+            displayCart();
+        });
+
+        $("#orderNowBtn").click(function () {
+            const cartArray = shoppingCart.listCart();
+            console.log("Cart Array:", cartArray);
+
+            $.ajax({
+                url: '/saveCart',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ items: cartArray }),
+                success: function (response) {
+
+                    shoppingCart.clearCart();
+                    displayCart();
+
+                    // Redirect to the /checkout route
+                    window.location.href = '/checkout';
+                },
+                error: function (error) {
+                    console.error('Error saving cart:', error);
+                }
+            });
+        });
+
+
+        function displayCart() {
+            const cartArray = shoppingCart.listCart();
+            console.log("Displaying Cart:", cartArray);
+
+            const output = cartArray.map(item =>
+                `<tr>
+            <td>${item.name}</td>
+            <td>(${item.price})</td>
+            <td>
+                <div class='input-group'>
+                    <button class='minus-item input-group-addon btn btn-primary' data-name=${item.name}>-</button>
+                    <input type='number' class='item-count form-control' data-name='${item.name}' name='itemCount' value='${item.count}'>
+                    <button class='plus-item btn btn-primary input-group-addon' data-name=${item.name}>+</button>
+                </div>
+            </td>
+            <td><button class='delete-item btn btn-danger' data-name=${item.name}>X</button></td>
+            <td>${item.total}</td>
+        </tr>`
+            ).join("");
+
+            $(".show-cart").html(output);
+            $(".total-cart").html(shoppingCart.totalCart());
+            $(".total-count").html(shoppingCart.totalCount());
         }
+
+        $(document).ready(function () {
+            displayCart();
+        });
+
     </script>
+</body>
+
+</html>
+
 </body>
 
 </html>

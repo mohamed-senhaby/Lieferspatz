@@ -13,15 +13,11 @@
   <style>
     .nav-pills .nav-link {
       color: black !important;
-      /* Set the desired text color for non-active links */
     }
 
-    /* Custom CSS to style the active link */
     .nav-pills .nav-link.active {
       color: white !important;
-      /* Set the desired text color for the active link */
       background-color: #007bff !important;
-      /* Set the desired background color for the active link */
     }
   </style>
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"
@@ -57,6 +53,45 @@
         .finally(() => {
           // Refresh the page
           window.location.href = window.location.href;
+        });
+    }
+
+
+
+    function confirmOrder(orderId) {
+
+      updateOrderStatus(orderId, 'Confirmed');
+    }
+
+    // Function to refuse an order
+    function refuseOrder(orderId) {
+      updateOrderStatus(orderId, 'Refused');
+    }
+
+    // Function to update the order status via AJAX
+    function updateOrderStatus(orderId, newStatus) {
+      // Send an AJAX request to the server to update the order status
+      fetch(`/update-order-status/${orderId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ newStatus }),
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          // Handle the response from the server (if needed)
+          console.log('Order status updated successfully:', data);
+          // Reload the page or update the UI as needed
+          location.reload();
+        })
+        .catch(error => {
+          console.error('There was a problem with the fetch operation:', error);
         });
     }
 
@@ -193,35 +228,51 @@
 
       <!-- Overview container -->
       <article id="overview" style="height: 100vh; display: block" class="content-section row">
-        <div class="row" style="
+
+        <% function calculateConfirmedOrders(orders) {%>
+          <%return orders.filter(order=> order.order_status === 'Confirmed').length;%>
+            <%}%>
+
+              <%function calculateRefusedOrders(orders) {%>
+                <%return orders.filter(order=> order.order_status === 'Refused').length;%>
+                  <%} %>
+                    <div class="row" style="
               margin-top: 50px;
               display: flex;
               flex-direction: row;
               justify-content: space-evenly;
               align-items: center;
             ">
-          <div class="card text-bg-success mb-3" style="max-width: 18rem; height: 110px">
-            <div class="card-header">Total orders</div>
-            <div class="card-body">
-              <p class="card-text">total orders = <span>0</span></p>
-            </div>
-          </div>
+                      <div class="card text-bg-success mb-3" style="max-width: 18rem; height: 110px">
+                        <div class="card-header">Total orders</div>
+                        <div class="card-body">
+                          <p class="card-text">total orders = <span>
+                              <%= orders.length %>
+                            </span></p>
+                        </div>
+                      </div>
 
-          <div class="card text-bg-primary mb-3" style="max-width: 18rem; height: 110px">
-            <div class="card-header">New orders</div>
-            <div class="card-body">
-              <p class="card-text">New orders = <span>0</span></p>
-            </div>
-          </div>
+                      <div class="card text-bg-primary mb-3" style="max-width: 18rem; height: 110px">
+                        <div class="card-header">Confirmed orders</div>
+                        <div class="card-body">
+                          <p class="card-text">Confirmed orders = <span>
+                              <%= calculateConfirmedOrders(orders) %>
+                            </span></p>
+                        </div>
+                      </div>
 
-          <div class="card text-bg-danger mb-3" style="max-width: 18rem; height: 110px">
-            <div class="card-header">Refused orders</div>
-            <div class="card-body">
-              <p class="card-text">Refused orders = <span>0</span></p>
-            </div>
-          </div>
-        </div>
+                      <div class="card text-bg-danger mb-3" style="max-width: 18rem; height: 110px">
+                        <div class="card-header">Refused orders</div>
+                        <div class="card-body">
+                          <p class="card-text">Refused orders = <span>
+                              <%= calculateRefusedOrders(orders) %>
+                            </span></p>
+                        </div>
+                      </div>
+                    </div>
       </article>
+
+
 
       <!-- Menu container -->
       <article id="menu" style="display: none" class="content-section">
@@ -377,7 +428,7 @@
       </article>
 
       <!-- Orders container -->
-      <article id="orders" class="content-section row" style="display: none">
+      <article id="orders" class="content-section row">
         <div style="margin-top: 10px">
           <h3>Orders</h3>
           <hr />
@@ -393,49 +444,40 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Wagih</td>
-                <td>10:30</td>
-                <td>2011-04-25</td>
-                <td>616</td>
-                <td>18 Euro</td>
-                <td>
-                  <a href="#" class="btn btn-primary my-2" data-bs-toggle="modal" data-bs-target="#viewOrderModal"
-                    onclick="viewOrder()">View Order</a>
-                </td>
-              </tr>
+              <% for (const order of orders) { %>
+                <tr>
+                  <td>
+                    <%= order.item_name %>
+                  </td>
+                  <td>
+                    <%= order.order_date_time %>
+                  </td>
+                  <td>
+                    <%= order.order_date_date %>
+                  </td>
+                  <td>
+                    <%= order.id %>
+                  </td>
+                  <td>
+                    <%= order.total_price %> Euro
+                  </td>
+                  <td>
+                    <a href="#" class="btn btn-primary my-2 confirm-order-btn" data-bs-toggle="modal"
+                      data-bs-target="#viewOrderModal" data-order-id="<%= order.id %>"
+                      onclick="confirmOrder('<%= order.id %>')">Confirm Order</a>
+                    <a href="#" class="btn btn-danger my-2 refuse-order-btn" data-bs-toggle="modal"
+                      data-bs-target="#viewOrderModal" data-order-id="<%= order.id %>"
+                      onclick="refuseOrder('<%= order.id %>')">Refuse Order</a>
+                  </td>
+                </tr>
+                <% } %>
             </tbody>
           </table>
         </div>
 
-        <div class="modal fade" id="viewOrderModal" tabindex="-1" aria-labelledby="viewOrderLabel" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h1 class="modal-title fs-5" id="exampleModalLabel">
-                  Order Details
-                </h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                <form class="item" action="/add-item" method="post" enctype="multipart/form-data">
-                  <div class="modal-footer row">
-                    <button type="submit" name="button" class="btn btn-outline-primary">
-                      Confirm Order
-                    </button>
-                    <button type="submit" name="button" class="btn btn-outline-danger">
-                      Refuse Order
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                      Close
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
+
       </article>
+
 
       <!-- ordersHistory container -->
       <article id="ordersHistory" class="content-section row" style="display: none">
@@ -454,17 +496,28 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Wagih</td>
-                <td>10:30</td>
-                <td>2011-04-25</td>
-                <td>616</td>
-                <td>18 Euro</td>
-                <td>
-                  <a href="#" class="btn btn-primary my-2" data-bs-toggle="modal"
-                    data-bs-target="#viewOrderHistoryModal" onclick="viewOrder()">View Order</a>
-                </td>
-              </tr>
+              <% for (const order of orders) { %>
+                <tr>
+                  <td>
+                    <%= order.item_name %>
+                  </td>
+                  <td>
+                    <%= order.order_date_time %>
+                  </td>
+                  <td>
+                    <%= order.order_date_date %>
+                  </td>
+                  <td>
+                    <%= order.id %>
+                  </td>
+                  <td>
+                    <%= order.total_price %> Euro
+                  </td>
+                  <td>
+                    <%= order.order_status %>
+                  </td>
+                </tr>
+                <% } %>
             </tbody>
           </table>
         </div>
@@ -496,80 +549,15 @@
   </div>
 
   <!-- Footer -->
-  <section id="contact" class="gradient-background">
-    <div class="container">
-      <footer class="row row-cols-1 row-cols-sm-2 row-cols-md-5 py-5 mt-5 border-top">
-        <div class="col mb-3">
-          <p class="text-body-secondary">© Lieferspatz</p>
-        </div>
+  <footer class="my-5 pt-5 text-body-secondary text-center text-small">
+    <p class="mb-1" id="copyright">©<span id="currentYear"></span> Lieferptatz</p>
+    <ul class="list-inline">
+      <li class="list-inline-item"><a href="#">Privacy</a></li>
+      <li class="list-inline-item"><a href="#">Terms</a></li>
+      <li class="list-inline-item"><a href="#">Support</a></li>
+    </ul>
+  </footer>
 
-        <div class="col mb-3"></div>
-
-        <div class="col mb-3">
-          <h5>Section</h5>
-          <ul class="nav flex-column">
-            <li class="nav-item mb-2">
-              <a href="#title" class="nav-link p-0 text-body-secondary">Home</a>
-            </li>
-            <li class="nav-item mb-2">
-              <a href="#features" class="nav-link p-0 text-body-secondary">Features</a>
-            </li>
-            <li class="nav-item mb-2">
-              <a href="#" class="nav-link p-0 text-body-secondary">Pricing</a>
-            </li>
-            <li class="nav-item mb-2">
-              <a href="#" class="nav-link p-0 text-body-secondary">FAQs</a>
-            </li>
-            <li class="nav-item mb-2">
-              <a href="#" class="nav-link p-0 text-body-secondary">About</a>
-            </li>
-          </ul>
-        </div>
-
-        <div class="col mb-3">
-          <h5>Section</h5>
-          <ul class="nav flex-column">
-            <li class="nav-item mb-2">
-              <a href="#" class="nav-link p-0 text-body-secondary">Home</a>
-            </li>
-            <li class="nav-item mb-2">
-              <a href="#" class="nav-link p-0 text-body-secondary">Features</a>
-            </li>
-            <li class="nav-item mb-2">
-              <a href="#" class="nav-link p-0 text-body-secondary">Pricing</a>
-            </li>
-            <li class="nav-item mb-2">
-              <a href="#" class="nav-link p-0 text-body-secondary">FAQs</a>
-            </li>
-            <li class="nav-item mb-2">
-              <a href="#" class="nav-link p-0 text-body-secondary">About</a>
-            </li>
-          </ul>
-        </div>
-
-        <div class="col mb-3">
-          <h5>Section</h5>
-          <ul class="nav flex-column">
-            <li class="nav-item mb-2">
-              <a href="/" class="nav-link p-0 text-body-secondary">Home</a>
-            </li>
-            <li class="nav-item mb-2">
-              <a href="/" class="nav-link p-0 text-body-secondary">Sign in</a>
-            </li>
-            <li class="nav-item mb-2">
-              <a href="#" class="nav-link p-0 text-body-secondary">Register</a>
-            </li>
-            <li class="nav-item mb-2">
-              <a href="#" class="nav-link p-0 text-body-secondary">FAQs</a>
-            </li>
-            <li class="nav-item mb-2">
-              <a href="#" class="nav-link p-0 text-body-secondary">About</a>
-            </li>
-          </ul>
-        </div>
-      </footer>
-    </div>
-  </section>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
     integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
@@ -605,69 +593,14 @@
       });
     });
 
-    // function addItem() {
-    //   // Create a new card element
-    //   var newCard = `
-    //   <div class="col">
-    //     <div class="card shadow-sm">
-    //       <svg
-    //                     class="bd-placeholder-img card-img-top"
-    //                     width="100%"
-    //                     height="225"
-    //                     xmlns="http://www.w3.org/2000/svg"
-    //                     role="img"
-    //                     aria-label="Placeholder: صورة مصغرة"
-    //                     preserveAspectRatio="xMidYMid slice"
-    //                     focusable="false"
-    //                   >
-    //                     <title>Placeholder</title>
-    //                     <rect width="100%" height="100%" fill="#55595c"></rect>
-    //                     <text x="50%" y="50%" fill="#eceeef" dy=".3em">
-    //                       صورة مصغرة
-    //                     </text>
-    //                   </svg>
-    //                   <div class="card-body">
-    //                     <p class="card-text">
-    //                       هذه بطاقة أوسع مع نص داعم أدناه كمقدمة طبيعية لمحتوى
-    //                       إضافي. هذا المحتوى أطول قليلاً.
-    //                     </p>
-    //                     <div
-    //                       class="d-flex justify-content-between align-items-center"
-    //                     >
-    //                       <div class="btn-group">
-    //                         <button
-    //                           type="button"
-    //                           class="btn btn-sm btn-outline-primary"
-    //                         >
-    //                           View
-    //                         </button>
-    //                         <button
-    //                           type="button"
-    //                           class="btn btn-sm btn-outline-success"
-    //                         >
-    //                           Edit
-    //                         </button>
-    //                         <button
-    //                           type="button"
-    //                           class="btn btn-sm btn-outline-danger"
-    //                         >
-    //                           Delete
-    //                         </button>
-    //                       </div>
-    //                       <large class="text-body-secondary">9 دقائق</large>
-    //                     </div>
-    //                   </div>        </div>
-    //   </div>
-    // `;
-
-    //   // Append the new card to the container
-    //   $(".row-cols-1.row-cols-sm-2.row-cols-md-3.g-3").append(newCard);
-    // }
-
     new DataTable("#ordersTable");
 
     new DataTable("#ordersHistoryTable");
+
+
+
   </script>
+
 </body>
 
 </html>
