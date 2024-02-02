@@ -19,7 +19,7 @@ app.use(express.json());
 
 app.use(
   session({
-    secret: "your-secret-key",
+    secret: process.env.SESSION_KEY, // Replace "your_secret_key_here" with your actual secret key
     resave: false,
     saveUninitialized: false,
   })
@@ -63,12 +63,13 @@ const db = new sqlite3.Database(__dirname + "/database.db", (err) => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       restaurant_id INTEGER,
       itemName TEXT NOT NULL,
-      itemPrice INTEGER NOT NULL,
+      itemPrice REAL NOT NULL, 
       image TEXT,
       category TEXT,
       description TEXT,
       FOREIGN KEY (restaurant_id) REFERENCES users (id)
     );
+    
     
 `);
 
@@ -191,38 +192,52 @@ app.post("/register", (req, res) => {
 });
 
 app.get("/resturant-profile/:id", (req, res) => {
-  const restaurantId = req.params.id;
+  try {
+    const restaurantId = req.params.id;
+    const signedInUser = req.session.user;
 
-  db.get(
-    "SELECT * FROM users WHERE id = ?",
-    [restaurantId],
-    (err, restaurant) => {
-      if (err) {
-        console.error(
-          "Error retrieving restaurant data from the database:",
-          err
-        );
-        res.status(500).send("Internal Server Error");
-      } else {
-        if (!restaurant) {
-          res.status(404).send("Restaurant not found");
-        } else {
-          db.all(
-            "SELECT * FROM items WHERE restaurant_id = ?",
-            [restaurantId],
-            (err, items) => {
-              if (err) {
-                console.error("Error retrieving items from the database:", err);
-                res.status(500).send("Internal Server Error");
-              } else {
-                res.render("resturant-profile.ejs", { restaurant, items });
-              }
-            }
+    if (!signedInUser) {
+      console.error("User not authenticated");
+      return res.redirect("/signin");
+    }
+
+    db.get(
+      "SELECT * FROM users WHERE id = ?",
+      [restaurantId],
+      (err, restaurant) => {
+        if (err) {
+          console.error(
+            "Error retrieving restaurant data from the database:",
+            err
           );
+          res.status(500).send("Internal Server Error");
+        } else {
+          if (!restaurant) {
+            res.status(404).send("Restaurant not found");
+          } else {
+            db.all(
+              "SELECT * FROM items WHERE restaurant_id = ?",
+              [restaurantId],
+              (err, items) => {
+                if (err) {
+                  console.error(
+                    "Error retrieving items from the database:",
+                    err
+                  );
+                  res.status(500).send("Internal Server Error");
+                } else {
+                  res.render("resturant-profile.ejs", { restaurant, items });
+                }
+              }
+            );
+          }
         }
       }
-    }
-  );
+    );
+  } catch (error) {
+    console.error("Error retrieving restaurant profile:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 app.get("/register", (req, res) => {
@@ -327,17 +342,29 @@ app.post("/signin", (req, res) => {
 });
 
 app.get("/restaurants", (req, res) => {
-  db.all(
-    "SELECT * FROM users WHERE userType = 'restaurantOwner'",
-    (err, restaurants) => {
-      if (err) {
-        console.error("Error retrieving restaurants from the database:", err);
-        res.status(500).send("Internal Server Error");
-      } else {
-        res.render("restaurants.ejs", { restaurants });
-      }
+  try {
+    const signedInUser = req.session.user;
+
+    if (!signedInUser) {
+      console.error("User not authenticated");
+      return res.redirect("/signin");
     }
-  );
+
+    db.all(
+      "SELECT * FROM users WHERE userType = 'restaurantOwner'",
+      (err, restaurants) => {
+        if (err) {
+          console.error("Error retrieving restaurants from the database:", err);
+          res.status(500).send("Internal Server Error");
+        } else {
+          res.render("restaurants.ejs", { restaurants });
+        }
+      }
+    );
+  } catch (error) {
+    console.error("Error retrieving restaurants:", error);
+    res.status(500).send("Internal Server Error");
+  }
 });
 
 app.get("/DashboardRest", (req, res) => {
@@ -378,6 +405,36 @@ app.get("/DashboardRest", (req, res) => {
     );
   } catch (error) {
     console.error("Error retrieving items:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/my-order", (req, res) => {
+  try {
+    const signedInUser = req.session.user;
+
+    if (!signedInUser) {
+      console.error("User not authenticated");
+      return res.redirect("/signin");
+    }
+
+    const userId = signedInUser.id;
+
+    // Fetch orders for the signed-in user from the database
+    db.all(
+      "SELECT * FROM orders WHERE user_id = ?",
+      [userId],
+      (err, orders) => {
+        if (err) {
+          console.error("Error retrieving orders from the database:", err);
+          return res.status(500).send("Internal Server Error");
+        }
+
+        res.render("myOrder.ejs", { orders });
+      }
+    );
+  } catch (error) {
+    console.error("Error retrieving orders:", error);
     res.status(500).send("Internal Server Error");
   }
 });
@@ -634,6 +691,19 @@ app.put("/update-order-status/:id", (req, res) => {
       }
     }
   );
+});
+
+app.get("/signout", (req, res) => {
+  // Destroy the session to clear user data
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Error destroying session:", err);
+      res.status(500).send("Internal Server Error");
+    } else {
+      // Redirect the user to the home page
+      res.redirect("/");
+    }
+  });
 });
 
 app.listen(port, () => {
