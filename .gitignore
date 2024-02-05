@@ -3,6 +3,7 @@
 node_modules
 authentication.js
 .env
+database.db
 
 # Logs
 logs
