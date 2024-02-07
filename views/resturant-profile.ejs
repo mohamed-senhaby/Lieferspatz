@@ -12,11 +12,7 @@
     <link rel="stylesheet" href="//cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css" />
 
     <script>
-        /*!
-         * Color mode toggler for Bootstrap's docs (https://getbootstrap.com/)
-         * Copyright 2011-2023 The Bootstrap Authors
-         * Licensed under the Creative Commons Attribution 3.0 Unported License.
-         */
+
 
         (() => {
             "use strict";
@@ -420,8 +416,9 @@
                         </div>
 
                         <div class="col-lg-6 d-lg-block">
-                            <img src="/images/<%= restaurant.image %>" alt="<%= restaurant.RestaurantName %>"
-                                width="35%" class="resturant-logo" style="border-radius: 3px" />
+                            <img src="/images/resturants_logo/<%= restaurant.image %>"
+                                alt="<%= restaurant.RestaurantName %>" width="35%" class="resturant-logo"
+                                style="border-radius: 3px" />
                         </div>
                     </div>
                 </h1>
@@ -549,8 +546,8 @@
                     </div>
                     <div class="bg-body-tertiary shadow-sm mx-auto overflow-hidden"
                         style="width: 80%; height: 300px; border-radius: 21px 21px 0 0">
-                        <img src="/images/<%= item.image %>" alt="<%= item.itemName %>" width="580px" height="310px"
-                            style="border-radius: 10px" />
+                        <img src="/images/menu_item/<%= item.image %>" alt="<%= item.itemName %>" width="580px"
+                            height="310px" style="border-radius: 10px" />
                     </div>
                 </div>
                 <% }); %>
@@ -654,7 +651,7 @@
             };
         })();
 
-        // Event handlers
+
         $(".add-to-cart").click(function (event) {
             event.preventDefault();
             const name = $(this).data("name");
@@ -702,7 +699,6 @@
                     shoppingCart.clearCart();
                     displayCart();
 
-                    // Redirect to the /checkout route
                     window.location.href = '/checkout';
                 },
                 error: function (error) {

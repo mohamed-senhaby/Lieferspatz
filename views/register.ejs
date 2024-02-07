@@ -88,28 +88,23 @@
       var closingTimeField = document.getElementById('closingTime');
       var form = document.querySelector('form');
 
-      // Function to toggle visibility of customer and restaurant fields
       function toggleFields() {
         if (userTypeSelect.value === 'customer') {
           customerFields.style.display = 'block';
           restaurantFields.style.display = 'none';
-          // Disable required attribute for restaurant fields
           disableRequiredAttribute(restaurantFields);
         } else if (userTypeSelect.value === 'restaurantOwner') {
           customerFields.style.display = 'none';
           restaurantFields.style.display = 'block';
-          // Disable required attribute for customer fields
           disableRequiredAttribute(customerFields);
         } else {
           customerFields.style.display = 'none';
           restaurantFields.style.display = 'none';
-          // Disable required attribute for both customer and restaurant fields
           disableRequiredAttribute(customerFields);
           disableRequiredAttribute(restaurantFields);
         }
       }
 
-      // Function to disable the required attribute for fields
       function disableRequiredAttribute(fieldsContainer) {
         var requiredFields = fieldsContainer.querySelectorAll('[required]');
         requiredFields.forEach(function (field) {
@@ -117,7 +112,6 @@
         });
       }
 
-      // Function to toggle visibility of opening and closing time fields
       function toggleTimeFields() {
         if (userTypeSelect.value === 'restaurantOwner') {
           openingTimeField.parentElement.style.display = 'block';
@@ -128,17 +122,13 @@
         }
       }
 
-      // Function to handle form submission
       function handleFormSubmit(event) {
-        // Include additional logic here to customize the form submission
         console.log('Form submitted!');
       }
 
-      // Initial setup
       toggleFields();
       toggleTimeFields();
 
-      // Add event listeners
       userTypeSelect.addEventListener('change', function () {
         toggleFields();
         toggleTimeFields();
@@ -268,8 +258,12 @@
 
 
       <button type="submit">Register</button>
-    </form>
 
+    </form>
+    <p style="
+    margin-bottom: 0px;
+    margin-top: 1rem;
+">Do you have an account? <a href="/signin">signin here</a></p>
 
   </div>
 

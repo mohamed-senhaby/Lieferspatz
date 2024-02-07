@@ -19,7 +19,7 @@ app.use(express.json());
 
 app.use(
   session({
-    secret: process.env.SESSION_KEY, // Replace "your_secret_key_here" with your actual secret key
+    secret: process.env.SESSION_KEY,
     resave: false,
     saveUninitialized: false,
   })
@@ -97,6 +97,15 @@ const db = new sqlite3.Database(__dirname + "/database.db", (err) => {
 app.get("/", (req, res) => {
   try {
     res.render("main.ejs");
+  } catch (error) {
+    console.error("Error retrieving items:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/register", (req, res) => {
+  try {
+    res.render("register.ejs");
   } catch (error) {
     console.error("Error retrieving items:", error);
     res.status(500).send("Internal Server Error");
@@ -184,106 +193,6 @@ app.post("/register", (req, res) => {
   );
 });
 
-app.get("/resturant-profile/:id", (req, res) => {
-  try {
-    const restaurantId = req.params.id;
-    const signedInUser = req.session.user;
-
-    if (!signedInUser) {
-      console.error("User not authenticated");
-      return res.redirect("/signin");
-    }
-
-    db.get(
-      "SELECT * FROM users WHERE id = ?",
-      [restaurantId],
-      (err, restaurant) => {
-        if (err) {
-          console.error(
-            "Error retrieving restaurant data from the database:",
-            err
-          );
-          res.status(500).send("Internal Server Error");
-        } else {
-          if (!restaurant) {
-            res.status(404).send("Restaurant not found");
-          } else {
-            db.all(
-              "SELECT * FROM items WHERE restaurant_id = ?",
-              [restaurantId],
-              (err, items) => {
-                if (err) {
-                  console.error(
-                    "Error retrieving items from the database:",
-                    err
-                  );
-                  res.status(500).send("Internal Server Error");
-                } else {
-                  res.render("resturant-profile.ejs", { restaurant, items });
-                }
-              }
-            );
-          }
-        }
-      }
-    );
-  } catch (error) {
-    console.error("Error retrieving restaurant profile:", error);
-    res.status(500).send("Internal Server Error");
-  }
-});
-
-app.get("/register", (req, res) => {
-  try {
-    res.render("register.ejs");
-  } catch (error) {
-    console.error("Error retrieving items:", error);
-    res.status(500).send("Internal Server Error");
-  }
-});
-
-app.get("/checkout", (req, res) => {
-  try {
-    const signedInUser = req.session.user;
-
-    if (!signedInUser) {
-      console.error("User not authenticated");
-      return res.redirect("/signin");
-    }
-
-    const userId = signedInUser.id;
-
-    const now = new Date().toISOString().slice(0, 19).replace("T", " ");
-
-    db.all(
-      // the O is only because i want here to get a specific column..
-      `
-      SELECT *
-      FROM orders o 
-      WHERE user_id = ? AND order_date_date = ? AND order_date_time <= ?
-      AND NOT EXISTS (
-        SELECT 1
-        FROM orders
-        WHERE user_id = o.user_id AND item_id = o.item_id
-          AND order_date_date = ? AND order_date_time > o.order_date_time
-      )
-      `,
-      [userId, now.split(" ")[0], now.split(" ")[1], now.split(" ")[0]],
-      (err, orders) => {
-        if (err) {
-          console.error("Error retrieving user orders from the database:", err);
-          return res.status(500).send("Internal Server Error");
-        }
-
-        res.render("checkout.ejs", { orders });
-      }
-    );
-  } catch (error) {
-    console.error("Error retrieving items:", error);
-    res.status(500).send("Internal Server Error");
-  }
-});
-
 app.get("/signin", (req, res) => {
   try {
     res.render("signin.ejs");
@@ -343,14 +252,11 @@ app.get("/restaurants", (req, res) => {
       return res.redirect("/signin");
     }
 
-    // Get the postal code (plz) of the signed-in user
     const userPlz = signedInUser.PostNumber;
 
-    // Define the range of plz values (5 plz difference)
     const minPlz = userPlz - 5;
     const maxPlz = userPlz + 5;
 
-    // Query the database for restaurants within the defined plz range
     db.all(
       "SELECT * FROM users WHERE userType = 'restaurantOwner' AND RestaurantPostNumber >= ? AND RestaurantPostNumber <= ?",
       [minPlz, maxPlz],
@@ -365,6 +271,55 @@ app.get("/restaurants", (req, res) => {
     );
   } catch (error) {
     console.error("Error retrieving restaurants:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/resturant-profile/:id", (req, res) => {
+  try {
+    const restaurantId = req.params.id;
+    const signedInUser = req.session.user;
+
+    if (!signedInUser) {
+      console.error("User not authenticated");
+      return res.redirect("/signin");
+    }
+
+    db.get(
+      "SELECT * FROM users WHERE id = ?",
+      [restaurantId],
+      (err, restaurant) => {
+        if (err) {
+          console.error(
+            "Error retrieving restaurant data from the database:",
+            err
+          );
+          res.status(500).send("Internal Server Error");
+        } else {
+          if (!restaurant) {
+            res.status(404).send("Restaurant not found");
+          } else {
+            db.all(
+              "SELECT * FROM items WHERE restaurant_id = ?",
+              [restaurantId],
+              (err, items) => {
+                if (err) {
+                  console.error(
+                    "Error retrieving items from the database:",
+                    err
+                  );
+                  res.status(500).send("Internal Server Error");
+                } else {
+                  res.render("resturant-profile.ejs", { restaurant, items });
+                }
+              }
+            );
+          }
+        }
+      }
+    );
+  } catch (error) {
+    console.error("Error retrieving restaurant profile:", error);
     res.status(500).send("Internal Server Error");
   }
 });
@@ -411,6 +366,26 @@ app.get("/DashboardRest", (req, res) => {
   }
 });
 
+app.put("/update-order-status/:id", (req, res) => {
+  const orderId = req.params.id;
+  const newStatus = req.body.newStatus;
+
+  db.run(
+    "UPDATE orders SET order_status = ? WHERE id = ?",
+    [newStatus, orderId],
+    (err) => {
+      if (err) {
+        console.error("Error updating order status in the database:", err);
+        res
+          .status(500)
+          .json({ success: false, error: "Internal Server Error" });
+      } else {
+        res.json({ success: true });
+      }
+    }
+  );
+});
+
 app.get("/my-order", (req, res) => {
   try {
     const signedInUser = req.session.user;
@@ -422,7 +397,6 @@ app.get("/my-order", (req, res) => {
 
     const userId = signedInUser.id;
 
-    // Fetch orders for the signed-in user from the database
     db.all(
       "SELECT * FROM orders WHERE user_id = ?",
       [userId],
@@ -444,9 +418,6 @@ app.get("/my-order", (req, res) => {
 app.post("/add-item", (req, res) => {
   const { itemName, itemPrice, image, category, description } = req.body;
 
-  console.log(req.session.user);
-
-  // Retrieve the restaurant owner's information from the session
   const restaurantOwner = req.session.user;
   const restaurantId = restaurantOwner ? restaurantOwner.id : null;
 
@@ -455,7 +426,6 @@ app.post("/add-item", (req, res) => {
     return res.status(500).send("Internal Server Error");
   }
 
-  // Insert the item data into the database
   db.run(
     `
     INSERT INTO items (restaurant_id, itemName, itemPrice, image, category, description)
@@ -484,7 +454,6 @@ app.post("/update-item/:id", (req, res) => {
     editDescription,
   } = req.body;
 
-  // Update the item in the database
   db.run(
     `
     UPDATE items
@@ -534,7 +503,6 @@ app.all("/delete-menu", (req, res) => {
   }
 
   if (req.method === "POST") {
-    // Delete all items associated with the restaurant
     db.run(
       "DELETE FROM items WHERE restaurant_id = ?",
       [restaurantId],
@@ -617,6 +585,47 @@ app.post("/saveCart", (req, res) => {
   processCartItem();
 });
 
+app.get("/checkout", (req, res) => {
+  try {
+    const signedInUser = req.session.user;
+
+    if (!signedInUser) {
+      console.error("User not authenticated");
+      return res.redirect("/signin");
+    }
+
+    const userId = signedInUser.id;
+
+    const now = new Date().toISOString().slice(0, 19).replace("T", " ");
+
+    db.all(
+      `
+      SELECT *
+      FROM orders o 
+      WHERE user_id = ? AND order_date_date = ? AND order_date_time <= ?
+      AND NOT EXISTS (
+        SELECT 1
+        FROM orders
+        WHERE user_id = o.user_id AND item_id = o.item_id
+          AND order_date_date = ? AND order_date_time > o.order_date_time
+      )
+      `,
+      [userId, now.split(" ")[0], now.split(" ")[1], now.split(" ")[0]],
+      (err, orders) => {
+        if (err) {
+          console.error("Error retrieving user orders from the database:", err);
+          return res.status(500).send("Internal Server Error");
+        }
+
+        res.render("checkout.ejs", { orders });
+      }
+    );
+  } catch (error) {
+    console.error("Error retrieving items:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 app.get("/users", (req, res) => {
   db.all("SELECT * FROM users", (err, rows) => {
     if (err) {
@@ -675,34 +684,12 @@ app.get("/items", (req, res) => {
   });
 });
 
-app.put("/update-order-status/:id", (req, res) => {
-  const orderId = req.params.id;
-  const newStatus = req.body.newStatus;
-
-  db.run(
-    "UPDATE orders SET order_status = ? WHERE id = ?",
-    [newStatus, orderId],
-    (err) => {
-      if (err) {
-        console.error("Error updating order status in the database:", err);
-        res
-          .status(500)
-          .json({ success: false, error: "Internal Server Error" });
-      } else {
-        res.json({ success: true });
-      }
-    }
-  );
-});
-
 app.get("/signout", (req, res) => {
-  // Destroy the session to clear user data
   req.session.destroy((err) => {
     if (err) {
       console.error("Error destroying session:", err);
       res.status(500).send("Internal Server Error");
     } else {
-      // Redirect the user to the home page
       res.redirect("/");
     }
   });

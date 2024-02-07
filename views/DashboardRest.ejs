@@ -24,18 +24,15 @@
     integrity="sha256-oP6HI/tZ1aP6HI0M0/8lAc5Y4HMUZp0uE4iiIui3SsM=" crossorigin="anonymous"></script>
   <script>
     function editItem(itemId) {
-      // Open the corresponding edit-item modal
       $(`#editItemModal${itemId}`).modal('show');
     }
 
     function deleteItem(itemId) {
-      // Remove the card from the UI
       const cardToRemove = document.getElementById(`card-${itemId}`);
       if (cardToRemove) {
         cardToRemove.remove();
       }
 
-      // Send an AJAX request to delete the item
       fetch(`/delete-item/${itemId}`, {
         method: 'DELETE',
       })
@@ -43,15 +40,12 @@
         .then(data => {
           if (!data.success) {
             console.error('Error deleting item:', data.error);
-            // Handle error as needed
           }
         })
         .catch(error => {
           console.error('Error deleting item:', error);
-          // Handle error as needed
         })
         .finally(() => {
-          // Refresh the page
           window.location.href = window.location.href;
         });
     }
@@ -63,14 +57,11 @@
       updateOrderStatus(orderId, 'Confirmed');
     }
 
-    // Function to refuse an order
     function refuseOrder(orderId) {
       updateOrderStatus(orderId, 'Refused');
     }
 
-    // Function to update the order status via AJAX
     function updateOrderStatus(orderId, newStatus) {
-      // Send an AJAX request to the server to update the order status
       fetch(`/update-order-status/${orderId}`, {
         method: 'PUT',
         headers: {
@@ -85,9 +76,7 @@
           return response.json();
         })
         .then(data => {
-          // Handle the response from the server (if needed)
           console.log('Order status updated successfully:', data);
-          // Reload the page or update the UI as needed
           location.reload();
         })
         .catch(error => {
@@ -362,7 +351,7 @@
                     <% items.forEach(item=> { %>
                       <div class="col">
                         <div class="card shadow-sm">
-                          <img src="images/<%= item.image %>" alt="<%= item.image %>" />
+                          <img src="images/menu_item/<%= item.image %>" alt="<%= item.image %>" />
                           <div class="card-body">
                             <p class="card-text">
                               <%= item.itemName %>
@@ -550,18 +539,14 @@
         link.addEventListener("click", function (event) {
           event.preventDefault();
 
-          // Remove the "active" class from all links
           sidebarLinks.forEach(function (link) {
             link.classList.remove("active");
           });
 
-          // Add the "active" class to the clicked link
           link.classList.add("active");
 
-          // Get the content ID from the clicked link's href
           var contentId = link.getAttribute("href").substring(1);
 
-          // Show or hide content sections based on the clicked link
           var contentSections = document.querySelectorAll(".content-section");
           contentSections.forEach(function (section) {
             section.style.display =
@@ -572,10 +557,10 @@
     });
 
     new DataTable('#ordersTable', {
-      order: [[2, 'desc'], [1, 'desc']] // Sorts by date (index 1) ascending, then by another column (index 0) descending
+      order: [[2, 'desc'], [1, 'desc']]
     });
     new DataTable('#ordersHistoryTable', {
-      order: [[2, 'desc'], [1, 'desc']] // Sorts by date (index 1) ascending, then by another column (index 0) descending
+      order: [[2, 'desc'], [1, 'desc']]
     });
 
 
@@ -583,15 +568,11 @@
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      // Find the sign-out link element
       const signOutLink = document.getElementById("signOutLink");
 
-      // Add a click event listener to the sign-out link
       signOutLink.addEventListener("click", function (event) {
-        // Prevent the default behavior of the link
         event.preventDefault();
 
-        // Redirect to the sign-out URL
         window.location.href = "/signout";
       });
     });

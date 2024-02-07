@@ -91,11 +91,11 @@
     <script>
         document.getElementById("currentYear").innerHTML = new Date().getFullYear();
 
-        // Function to calculate estimated delivery time
+
         function calculateDeliveryTime(order) {
-            const preparationTime = 20; // preparation time in minutes
-            const totalPreparationTime = order.length * preparationTime; // Total preparation time for all items
-            const estimatedDeliveryTime = new Date(Date.now() + totalPreparationTime * 60000); // Convert minutes to milliseconds
+            const preparationTime = 20;
+            const totalPreparationTime = order.length * preparationTime;
+            const estimatedDeliveryTime = new Date(Date.now() + totalPreparationTime * 60000);
 
             return estimatedDeliveryTime.toDateString() + ' ' + estimatedDeliveryTime.toLocaleTimeString();
         }
