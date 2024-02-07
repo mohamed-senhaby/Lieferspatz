@@ -396,7 +396,7 @@
       </article>
 
       <!-- Orders container -->
-      <article id="orders" class="content-section row">
+      <article id="orders" style="display: none" class="content-section row">
         <div style="margin-top: 10px">
           <h3>Orders</h3>
           <hr />
@@ -407,6 +407,7 @@
                 <th>Time</th>
                 <th>Date</th>
                 <th>Order Id</th>
+                <th>Quantity</th>
                 <th>Total price</th>
                 <th>Status</th>
               </tr>
@@ -426,6 +427,9 @@
                     </td>
                     <td>
                       <%= order.id %>
+                    </td>
+                    <td>
+                      <%= order.quantity %>
                     </td>
                     <td>
                       <%= order.total_price %> Euro
@@ -459,6 +463,7 @@
                 <th>Time</th>
                 <th>Date</th>
                 <th>Order Id</th>
+                <th>Quantity</th>
                 <th>Total price</th>
                 <th>Status</th>
               </tr>
@@ -478,6 +483,9 @@
                     </td>
                     <td>
                       <%= order.id %>
+                    </td>
+                    <td>
+                      <%= order.quantity %>
                     </td>
                     <td>
                       <%= order.total_price %> Euro

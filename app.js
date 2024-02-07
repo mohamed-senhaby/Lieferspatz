@@ -2,7 +2,7 @@
 
 import express from "express";
 import bodyParser from "body-parser";
-import session from "express-session"; // Add session middleware
+import session from "express-session";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import sqlite3 from "sqlite3";
@@ -24,7 +24,6 @@ app.use(
     saveUninitialized: false,
   })
 );
-// Serve static files from the 'public' directory
 app.use(express.static(__dirname + "/public"));
 
 const db = new sqlite3.Database(__dirname + "/database.db", (err) => {
@@ -95,7 +94,6 @@ const db = new sqlite3.Database(__dirname + "/database.db", (err) => {
   }
 });
 
-// Define your routes
 app.get("/", (req, res) => {
   try {
     res.render("main.ejs");
@@ -128,7 +126,6 @@ app.post("/register", (req, res) => {
     description,
   } = req.body;
 
-  // Insert the data into the database
   db.run(
     `
     INSERT INTO users (
@@ -181,11 +178,7 @@ app.post("/register", (req, res) => {
       } else {
         console.log(`${userType} Data inserted successfully`);
 
-        if (userType === "restaurantOwner") {
-          res.redirect("/DashboardRest");
-        } else {
-          res.redirect("/signin");
-        }
+        res.redirect("/signin");
       }
     }
   );
@@ -350,8 +343,17 @@ app.get("/restaurants", (req, res) => {
       return res.redirect("/signin");
     }
 
+    // Get the postal code (plz) of the signed-in user
+    const userPlz = signedInUser.PostNumber;
+
+    // Define the range of plz values (5 plz difference)
+    const minPlz = userPlz - 5;
+    const maxPlz = userPlz + 5;
+
+    // Query the database for restaurants within the defined plz range
     db.all(
-      "SELECT * FROM users WHERE userType = 'restaurantOwner'",
+      "SELECT * FROM users WHERE userType = 'restaurantOwner' AND RestaurantPostNumber >= ? AND RestaurantPostNumber <= ?",
+      [minPlz, maxPlz],
       (err, restaurants) => {
         if (err) {
           console.error("Error retrieving restaurants from the database:", err);

@@ -214,9 +214,6 @@
             height: 0.75em;
         }
 
-        /*
- * Custom translucent site header
- */
 
         .site-header {
             background-color: rgba(0, 0, 0, 0.85);
@@ -234,9 +231,6 @@
             text-decoration: none;
         }
 
-        /*
- * Dummy devices (replace them with your own or something else entirely!)
- */
 
         .product-device {
             position: absolute;
@@ -268,9 +262,7 @@
             background-color: #e5e5e5;
         }
 
-        /*
- * Extra utilities
- */
+
 
         .flex-equal>* {
             flex: 1;
@@ -282,31 +274,7 @@
             }
         }
 
-        /* .navbar {
-        background-color: var(--navbar-bg-light);
-        color: var(--navbar-text-light);
-      } */
 
-        /* .navbar-dark #cart {
-        background-color: var(--navbar-text-light);
-   
-      }
-
-      .navbar-light #cart {
-        background-color: var(--navbar-text-dark);
-      }
-
-      #cart {
-        border-color: var(--navbar-text-light);
-      }
-
-      #cart :hover {
-        background-color: var(--navbar-bg-dark);
-      }
-
-      #cart {
-        filter: invert(1);
-      } */
 
         #cart {
             padding: 8px 16px;
@@ -403,13 +371,14 @@
 
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+                            <li class="nav-item">
+                                <a class="nav-link" href="/my-order">My Orders</a>
+                            </li>
 
                             <li class="nav-item" id="signOutLink">
                                 <a class="nav-link" href="/signout">Sign Out</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="/my-order">My Orders</a>
-                            </li>
+
                         </ul>
                     </div>
 

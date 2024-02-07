@@ -34,13 +34,14 @@
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
 
+                            <li class="nav-item">
+                                <a class="nav-link" href="/my-order">My Orders</a>
+                            </li>
                             <li class="nav-item" id="signOutLink">
                                 <a class="nav-link" href="/signout">Sign Out</a>
                             </li>
 
-                            <li class="nav-item">
-                                <a class="nav-link" href="/my-order">My Orders</a>
-                            </li>
+
                         </ul>
                     </div>
                 </div>
@@ -49,47 +50,54 @@
     </header>
 
     <main class="container" style="height: 100vh;">
-        <% restaurants.forEach(restaurant=> { %>
-            <div class="row mb-2" style="margin-top: 10rem;">
-                <div class="col-md-12">
-                    <div
-                        class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-                        <div class="col p-4 d-flex flex-column position-static">
-                            <h3 class="mb-0 text-white">
-                                <%= restaurant.RestaurantName %>
-                            </h3>
-                            <div class="mb-1 text-body-secondary">
-                                <%= restaurant.Category %>
+        <% if (restaurants.length> 0) { %>
+            <% restaurants.forEach(restaurant=> { %>
+                <div class="row mb-2" style="margin-top: 10rem;">
+                    <div class="col-md-12">
+                        <div
+                            class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+                            <div class="col p-4 d-flex flex-column position-static">
+                                <h3 class="mb-0 text-white">
+                                    <%= restaurant.RestaurantName %>
+                                </h3>
+                                <div class="mb-1 text-body-secondary">
+                                    <%= restaurant.Category %>
+                                </div>
+                                <h6 class="mb-0 text-white">
+                                    <%= restaurant.openingTime %> am -
+                                        <span>
+                                            <%= restaurant.closingTime %> pm
+                                        </span>
+                                </h6>
+                                <p class="card-text mb-auto mt-4">
+                                    <%= restaurant.description %>
+                                </p>
+                                <a href="/resturant-profile/<%= restaurant.id %>"
+                                    class="icon-link gap-1 icon-link-hover stretched-link">
+                                    View Profile
+                                </a>
                             </div>
-                            <h6 class="mb-0 text-white">
-                                <%= restaurant.openingTime %> am -
-                                    <span>
-                                        <%= restaurant.closingTime %> pm
-                                    </span>
-                            </h6>
-                            <!-- Add more details as needed -->
-                            <p class="card-text mb-auto mt-4">
-                                <%= restaurant.description %>
-                            </p>
-                            <a href="/resturant-profile/<%= restaurant.id %>"
-                                class="icon-link gap-1 icon-link-hover stretched-link">
-                                View Profile
-                            </a>
-                        </div>
-                        <div class="col-auto d-none d-lg-block">
-                            <svg class="bd-placeholder-img" width="200" height="250" xmlns="http://www.w3.org/2000/svg"
-                                role="img" aria-label="Placeholder: Thumbnail" preserveAspectRatio="xMidYMid slice"
-                                focusable="false">
-
-                                <image href="images\<%=restaurant.image %>" alt="<%= restaurant.RestaurantName %>"
-                                    class="bd-placeholder-img card-img-top" width="100%" height="100%" />
-                            </svg>
+                            <div class="col-auto d-none d-lg-block">
+                                <svg class="bd-placeholder-img" width="200" height="250"
+                                    xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail"
+                                    preserveAspectRatio="xMidYMid slice" focusable="false">
+                                    <image href="images\<%= restaurant.image %>" alt="<%= restaurant.RestaurantName %>"
+                                        class="bd-placeholder-img card-img-top" width="100%" height="100%" />
+                                </svg>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <% }); %>
+                <% }); %>
+                    <% } else { %>
+                        <div class="row justify-content-center mt-5">
+                            <div class="col-md-6 text-center">
+                                <h2 class="text-white">No restaurants available within your area</h2>
+                            </div>
+                        </div>
+                        <% } %>
     </main>
+
 
 
     <footer class="my-5 pt-5 text-body-secondary text-center text-small">

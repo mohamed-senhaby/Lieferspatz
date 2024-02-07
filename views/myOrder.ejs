@@ -37,12 +37,13 @@
                     <div class="offcanvas-body">
                         <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
 
-                            <li class="nav-item" id="signOutLink">
-                                <a class="nav-link" href="/signout">Sign Out</a>
-                            </li>
 
                             <li class="nav-item">
                                 <a class="nav-link" href="/my-order">My Orders</a>
+                            </li>
+
+                            <li class="nav-item" id="signOutLink">
+                                <a class="nav-link" href="/signout">Sign Out</a>
                             </li>
                         </ul>
                     </div>
@@ -62,6 +63,8 @@
                             <div class="card-body">
                                 <h5 class="card-title">Product: <%= order.item_name %>
                                 </h5>
+                                <p class="card-text">Quantity: <%= order.quantity %>
+                                </p>
                                 <p class="card-text">Status: <%= order.order_status %>
                                 </p>
                                 <p class="card-text">Time of Order :
